@@ -1,0 +1,1522 @@
+<!-- CSS Styles -->
+<style>
+    .trabalho-container * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    .trabalho-container {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        line-height: 1.6;
+        color: #333;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 20px;
+    }
+
+    .trabalho-container .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+    }
+
+    .trabalho-container .header {
+        background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+        color: white;
+        padding: 40px;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .trabalho-container .header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: repeating-linear-gradient(
+            45deg,
+            transparent,
+            transparent 10px,
+            rgba(255,255,255,0.03) 10px,
+            rgba(255,255,255,0.03) 20px
+        );
+        animation: drift 20s linear infinite;
+    }
+
+    @keyframes drift {
+        0% { transform: translateX(-50px); }
+        100% { transform: translateX(0px); }
+    }
+
+    .trabalho-container .header h1 {
+        font-size: 2.5em;
+        margin-bottom: 10px;
+        font-weight: 700;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        position: relative;
+        z-index: 1;
+    }
+
+    .trabalho-container .header .subtitle {
+        font-size: 1.2em;
+        opacity: 0.9;
+        margin-bottom: 20px;
+        position: relative;
+        z-index: 1;
+    }
+
+    .trabalho-container .course-info {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 10px;
+        margin-top: 20px;
+        position: relative;
+        z-index: 1;
+    }
+
+    .trabalho-container .course-info div {
+        background: rgba(255,255,255,0.1);
+        padding: 10px 15px;
+        border-radius: 8px;
+        backdrop-filter: blur(5px);
+    }
+
+    .trabalho-container .content {
+        padding: 40px;
+    }
+
+    .trabalho-container .section {
+        margin-bottom: 40px;
+        background: white;
+        border-radius: 15px;
+        padding: 30px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        border-left: 5px solid #3498db;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .trabalho-container .section:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+    }
+
+    .trabalho-container .section h2 {
+        color: #2c3e50;
+        font-size: 1.8em;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .trabalho-container .section h3 {
+        color: #34495e;
+        font-size: 1.4em;
+        margin: 25px 0 15px 0;
+        border-bottom: 2px solid #ecf0f1;
+        padding-bottom: 5px;
+    }
+
+    .trabalho-container .section h4 {
+        color: #2c3e50;
+        font-size: 1.2em;
+        margin: 20px 0 10px 0;
+    }
+
+    .trabalho-container .section ul {
+        margin-left: 0;
+        padding-left: 25px;
+    }
+
+    .trabalho-container .section li {
+        margin: 8px 0;
+        text-align: justify;
+    }
+
+    .trabalho-container .icon {
+        width: 30px;
+        height: 30px;
+        background: linear-gradient(135deg, #3498db, #2980b9);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: bold;
+        flex-shrink: 0;
+    }
+
+    .trabalho-container .algorithm-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+        margin-top: 20px;
+    }
+
+    .trabalho-container .algorithm-card {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border: 1px solid #dee2e6;
+        border-radius: 12px;
+        padding: 20px;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .trabalho-container .algorithm-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        border-color: #3498db;
+    }
+
+    .trabalho-container .algorithm-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 3px;
+        background: linear-gradient(90deg, #e74c3c, #f39c12, #f1c40f, #2ecc71, #3498db, #9b59b6);
+    }
+
+    .trabalho-container .algorithm-title {
+        font-weight: bold;
+        color: #2c3e50;
+        font-size: 1.1em;
+        margin-bottom: 8px;
+    }
+
+    .trabalho-container .algorithm-complexity {
+        color: #e74c3c;
+        font-family: 'Courier New', monospace;
+        background: #fff5f5;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 0.9em;
+        margin-bottom: 8px;
+        display: inline-block;
+    }
+
+    .trabalho-container .algorithm-description {
+        color: #7f8c8d;
+        font-size: 0.9em;
+        line-height: 1.4;
+    }
+
+    .trabalho-container .category-header {
+        background: linear-gradient(135deg, #3498db, #2980b9);
+        color: white;
+        padding: 15px 20px;
+        margin: 30px -20px 20px -20px;
+        font-weight: bold;
+        font-size: 1.1em;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .trabalho-container .requirements-list {
+        list-style: none;
+        padding: 0;
+    }
+
+    .trabalho-container .requirements-list li {
+        background: #f8f9fa;
+        margin: 10px 0;
+        padding: 15px;
+        border-left: 4px solid #3498db;
+        border-radius: 0 8px 8px 0;
+        transition: background-color 0.3s ease;
+    }
+
+    .trabalho-container .requirements-list li:hover {
+        background: #e3f2fd;
+    }
+
+    .trabalho-container .requirements-list li::before {
+        content: '✓';
+        color: #27ae60;
+        font-weight: bold;
+        margin-right: 10px;
+        font-size: 1.2em;
+    }
+
+    .trabalho-container .evaluation-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+        background: white;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    .trabalho-container .evaluation-table th {
+        background: linear-gradient(135deg, #34495e, #2c3e50);
+        color: white;
+        padding: 15px;
+        text-align: left;
+        font-weight: 600;
+    }
+
+    .trabalho-container .evaluation-table td {
+        padding: 12px 15px;
+        border-bottom: 1px solid #ecf0f1;
+    }
+
+    .trabalho-container .evaluation-table tr:hover {
+        background: #f8f9fa;
+    }
+
+    .trabalho-container .highlight-box {
+        background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+        border: 1px solid #ff6b9d;
+        border-radius: 10px;
+        padding: 20px;
+        margin: 20px 0;
+        color: #721c24;
+    }
+
+    .trabalho-container .highlight-box h4 {
+        color: #c0392b;
+        margin-bottom: 10px;
+        font-size: 1.1em;
+    }
+
+    .trabalho-container .deadline-box {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 25px;
+        border-radius: 15px;
+        text-align: center;
+        margin: 30px 0;
+        box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+    }
+
+    .trabalho-container .deadline-box h3 {
+        font-size: 1.5em;
+        margin-bottom: 10px;
+    }
+
+    .trabalho-container .deadline-box p {
+        font-size: 1.1em;
+        opacity: 0.9;
+    }
+
+    .trabalho-container code {
+        background: #f1f2f6;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-family: 'Courier New', monospace;
+        color: #e74c3c;
+    }
+
+    .trabalho-container .formula {
+        background: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        padding: 15px;
+        margin: 15px 0;
+        font-family: 'Times New Roman', serif;
+        text-align: center;
+        font-size: 1.1em;
+    }
+
+    /* Estilos para o exemplo Bubble Sort */
+    .trabalho-container pre {
+        background: #f1f2f6;
+        padding: 15px;
+        border-radius: 8px;
+        overflow-x: auto;
+        margin: 15px 0;
+        border-left: 4px solid #3498db;
+        font-family: 'Courier New', monospace;
+        font-size: 0.9em;
+        line-height: 1.4;
+    }
+
+    /* Syntax Highlighting */
+    .trabalho-container .keyword { color: #0066cc; font-weight: bold; }
+    .trabalho-container .string { color: #009900; }
+    .trabalho-container .comment { color: #999999; font-style: italic; }
+    .trabalho-container .number { color: #ff6600; }
+    .trabalho-container .function { color: #cc00cc; font-weight: bold; }
+    .trabalho-container .operator { color: #333333; font-weight: bold; }
+    .trabalho-container .variable { color: #663399; }
+    .trabalho-container .type { color: #006600; font-weight: bold; }
+    .trabalho-container .annotation { color: #808080; }
+
+    .trabalho-container .complexity-analysis {
+        background: #f0f8ff;
+        border: 2px solid #3498db;
+        border-radius: 10px;
+        padding: 25px;
+        margin: 20px 0;
+    }
+
+    .trabalho-container .cost-function {
+        background: #fff5f5;
+        border: 2px solid #e74c3c;
+        border-radius: 10px;
+        padding: 25px;
+        margin: 20px 0;
+    }
+
+    .trabalho-container .cost-function h4 {
+        color: #e74c3c;
+        margin-bottom: 15px;
+    }
+
+    .trabalho-container .instruction-analysis {
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        padding: 20px;
+        margin: 15px 0;
+        font-family: 'Courier New', monospace;
+        font-size: 0.9em;
+    }
+
+    .trabalho-container .instruction-line {
+        margin: 5px 0;
+        padding: 3px 0;
+    }
+
+    .trabalho-container .line-highlight {
+        background: #fff3cd;
+        padding: 2px 5px;
+        border-radius: 3px;
+        margin: 2px 0;
+    }
+
+    .trabalho-container table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 20px 0;
+    }
+
+    .trabalho-container table th, .trabalho-container table td {
+        padding: 12px;
+        text-align: center;
+        border: 1px solid #ddd;
+    }
+
+    .trabalho-container table th {
+        background: #34495e;
+        color: white;
+    }
+
+    .trabalho-container table tr:nth-child(even) {
+        background: #f8f9fa;
+    }
+
+    /* Estilos da Animação */
+    .trabalho-container .animation-container {
+        background: #f8f9fa;
+        border: 2px solid #3498db;
+        border-radius: 15px;
+        padding: 30px;
+        margin: 25px 0;
+        text-align: center;
+    }
+
+    .trabalho-container .array-container {
+        display: flex;
+        justify-content: center;
+        align-items: flex-end;
+        gap: 5px;
+        margin: 20px 0;
+        min-height: 150px;
+    }
+
+    .trabalho-container .array-element {
+        width: 50px;
+        background: #3498db;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        border-radius: 8px;
+        transition: all 0.5s ease;
+        position: relative;
+    }
+
+    .trabalho-container .array-element.comparing {
+        background: #e74c3c;
+        transform: scale(1.1);
+    }
+
+    .trabalho-container .array-element.swapping {
+        background: #f39c12;
+        animation: swap 0.8s ease-in-out;
+    }
+
+    .trabalho-container .array-element.sorted {
+        background: #27ae60;
+    }
+
+    @keyframes swap {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-20px); }
+    }
+
+    .trabalho-container .controls {
+        margin: 20px 0;
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .trabalho-container .btn {
+        padding: 12px 20px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: all 0.3s ease;
+    }
+
+    .trabalho-container .btn-primary {
+        background: #3498db;
+        color: white;
+    }
+
+    .trabalho-container .btn-success {
+        background: #27ae60;
+        color: white;
+    }
+
+    .trabalho-container .btn-warning {
+        background: #f39c12;
+        color: white;
+    }
+
+    .trabalho-container .btn-danger {
+        background: #e74c3c;
+        color: white;
+    }
+
+    .trabalho-container .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+
+    .trabalho-container .status {
+        background: #ecf0f1;
+        padding: 15px;
+        border-radius: 8px;
+        margin: 15px 0;
+        font-family: 'Courier New', monospace;
+    }
+
+    .trabalho-container .complexity-box {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 20px;
+        border-radius: 10px;
+        margin: 20px 0;
+        text-align: center;
+    }
+
+    .trabalho-container .chart-container {
+        background: white;
+        border-radius: 10px;
+        padding: 20px;
+        margin: 20px 0;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        width: 100%;
+    }
+
+    .trabalho-container .chart-container canvas {
+        width: 100% !important;
+        height: 400px !important;
+    }
+
+    @media (max-width: 768px) {
+        .trabalho-container {
+            padding: 10px;
+        }
+        
+        .trabalho-container .header {
+            padding: 20px;
+        }
+        
+        .trabalho-container .header h1 {
+            font-size: 1.8em;
+        }
+        
+        .trabalho-container .content {
+            padding: 20px;
+        }
+        
+        .trabalho-container .section {
+            padding: 20px;
+        }
+        
+        .trabalho-container .algorithm-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .trabalho-container .array-container {
+            flex-wrap: wrap;
+            min-height: auto;
+        }
+        
+        .trabalho-container .array-element {
+            width: 40px;
+            font-size: 0.9em;
+        }
+    }
+
+    .trabalho-container .pulse {
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+        100% { transform: scale(1); }
+    }
+</style>
+
+<!-- Chart.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- Conteúdo Principal -->
+<div class="trabalho-container">
+    <div class="container">
+        <div class="header">
+            <h1>📊 Análise de Complexidade de Algoritmos</h1>
+            <p class="subtitle">Análise Matemática e Empírica de Algoritmos Fundamentais</p>
+            <div class="course-info">
+                <div><strong>Disciplina:</strong> Técnicas de Programação Avançadas</div>
+                <div><strong>Professor:</strong> Rafael Mesquita</div>
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="section">
+                <h2><span class="icon">🎯</span>Objetivo do Trabalho</h2>
+                <p>Este trabalho tem como objetivo desenvolver a capacidade de análise tanto <strong>teórica quanto prática</strong> de algoritmos fundamentais da ciência da computação. Os estudantes deverão realizar uma investigação completa sobre um algoritmo específico, incluindo:</p>
+                <ul class="requirements-list">
+                    <li><strong>Análise Matemática:</strong> Determinar as complexidades de tempo e espaço através de métodos analíticos</li>
+                    <li><strong>Análise Empírica:</strong> Validar as previsões teóricas através de experimentos computacionais</li>
+                    <li><strong>Comparação Crítica:</strong> Relacionar teoria e prática, explicando possíveis divergências</li>
+                    <li><strong>Aplicabilidade:</strong> Discutir cenários reais onde o algoritmo é relevante</li>
+                </ul>
+            </div>
+
+            <div class="section">
+                <h2><span class="icon">🔬</span>Algoritmos Disponíveis para Análise</h2>
+                
+                <div class="category-header">
+                    🔢 Algoritmos de Ordenação (Divisão e Conquista)
+                </div>
+                <div class="algorithm-grid">
+                    <div class="algorithm-card">
+                        <div class="algorithm-title">1. Merge Sort</div>
+                        <div class="algorithm-complexity">O(n log n)</div>
+                        <div class="algorithm-description">Algoritmo estável baseado em divisão e conquista, ideal para grandes volumes de dados</div>
+                    </div>
+                    <div class="algorithm-card">
+                        <div class="algorithm-title">2. Quick Sort</div>
+                        <div class="algorithm-complexity">O(n log n) médio, O(n²) pior</div>
+                        <div class="algorithm-description">Muito rápido na prática, implementação in-place, análise de casos interessante</div>
+                    </div>
+                    <div class="algorithm-card">
+                        <div class="algorithm-title">3. Heap Sort</div>
+                        <div class="algorithm-complexity">O(n log n)</div>
+                        <div class="algorithm-description">Baseado em estruturas heap, não estável, usa pouca memória extra</div>
+                    </div>
+                </div>
+
+                <div class="category-header">
+                    🔁 Recursão e Algoritmos Exponenciais
+                </div>
+                <div class="algorithm-grid">
+                    <div class="algorithm-card">
+                        <div class="algorithm-title">4. Fibonacci (Recursivo vs Dinâmico)</div>
+                        <div class="algorithm-complexity">O(2ⁿ) vs O(n)</div>
+                        <div class="algorithm-description">Excelente para demonstrar otimização através de programação dinâmica</div>
+                    </div>
+                    <div class="algorithm-card">
+                        <div class="algorithm-title">5. Torre de Hanói</div>
+                        <div class="algorithm-complexity">O(2ⁿ - 1)</div>
+                        <div class="algorithm-description">Recursão clássica, modela problemas com regras rígidas</div>
+                    </div>
+                </div>
+
+                <div class="category-header">
+                    🎒 Programação Dinâmica
+                </div>
+                <div class="algorithm-grid">
+                    <div class="algorithm-card">
+                        <div class="algorithm-title">6. Problema da Mochila 0/1</div>
+                        <div class="algorithm-complexity">O(n·W)</div>
+                        <div class="algorithm-description">Otimização com tabela dinâmica, planejamento ótimo sob restrições</div>
+                    </div>
+                    <div class="algorithm-card">
+                        <div class="algorithm-title">7. Subsequência Comum Mais Longa (LCS)</div>
+                        <div class="algorithm-complexity">O(n·m)</div>
+                        <div class="algorithm-description">Matriz de programação dinâmica, aplicações em bioinformática e textos</div>
+                    </div>
+                </div>
+
+                <div class="category-header">
+                    🧠 Algoritmos Práticos e Analiticamente Interessantes
+                </div>
+                <div class="algorithm-grid">
+                    <div class="algorithm-card">
+                        <div class="algorithm-title">8. MDC - Algoritmo de Euclides</div>
+                        <div class="algorithm-complexity">O(log n)</div>
+                        <div class="algorithm-description">Recursão clássica, fundamental para criptografia (RSA)</div>
+                    </div>
+                    <div class="algorithm-card">
+                        <div class="algorithm-title">9. Conversão Decimal-Binário</div>
+                        <div class="algorithm-complexity">O(log n)</div>
+                        <div class="algorithm-description">Versões iterativa e recursiva, manipulação de bits</div>
+                    </div>
+                    <div class="algorithm-card">
+                        <div class="algorithm-title">10. Verificação de Número Primo</div>
+                        <div class="algorithm-complexity">O(n) vs O(√n)</div>
+                        <div class="algorithm-description">Comparação entre abordagem ingênua e otimizada</div>
+                    </div>
+                    <div class="algorithm-card">
+                        <div class="algorithm-title">11. Crivo de Eratóstenes</div>
+                        <div class="algorithm-complexity">O(n log log n)</div>
+                        <div class="algorithm-description">Eliminação em massa para gerar listas de números primos</div>
+                    </div>
+                    <div class="algorithm-card">
+                        <div class="algorithm-title">12. Run-Length Encoding (RLE)</div>
+                        <div class="algorithm-complexity">O(n)</div>
+                        <div class="algorithm-description">Compressão por contagem de repetições, simples e útil</div>
+                    </div>
+                    <div class="algorithm-card">
+                        <div class="algorithm-title">13. Busca de Padrão - Força Bruta vs KMP</div>
+                        <div class="algorithm-complexity">O(n·m) vs O(n + m)</div>
+                        <div class="algorithm-description">Comparação de eficiência em processamento de strings</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2><span class="icon">📋</span>Estrutura Obrigatória do Trabalho</h2>
+                
+                <h3>1. Introdução</h3>
+                <p>Contextualização do algoritmo, sua importância histórica e aplicações práticas. Definir claramente o problema que o algoritmo resolve.</p>
+
+                <h3>2. Descrição do Algoritmo</h3>
+                <ul class="requirements-list">
+                    <li><strong>Código limpo e bem documentado (Python, Java, JavaScript, etc.):</strong> Implementação de versões otimizadas quando aplicável</li>
+                    <li>Explicação passo-a-passo do funcionamento</li>
+                    <li>Exemplo prático de execução (animação)</li>
+                </ul>
+
+                <h3>3. Análise Matemática de Complexidade</h3>
+                <ul class="requirements-list">
+                    <li><strong>Análise de custo:</strong> Demonstrações matemáticas com recorrências, somatórios, indução</li>
+                    <li><strong>Notações assintóticas:</strong> Big-O, Ω (Omega) e Θ (Theta)</li>
+                    <li><strong>Complexidade de Tempo:</strong> Melhor, pior e caso médio</li>
+                </ul>
+
+                <div class="formula">
+                    <strong>Exemplo de análise matemática:</strong><br>
+                    T(n) = 2T(n/2) + O(n) ⟹ T(n) = O(n log n)
+                </div>
+
+                <h3>4. Análise Empírica</h3>
+                <ul class="requirements-list">
+                    <li><strong>Configuração de testes:</strong> Hardware, software, metodologia</li>
+                    <li><strong>Conjustos de teste:</strong> Entradas variadas, tamanhos, tipos (melhor/pior caso)</li>
+                    <li><strong>Resultados experimentais:</strong> Tempo de execução</li>
+                    <li><strong>Visualização gráfica dos resultados:</strong> Tabelas e gráficos para visualização clara dos resultados</li>
+                </ul>
+
+                <h3>5. Discussão e Comparação</h3>
+                <ul class="requirements-list">
+                    <li><strong>Validação da análise teórica:</strong> Comparação entre previsão teórica e resultados empíricos</li>
+                    <li><strong>Possíveis divergências:</strong> Explicação de possíveis divergências</li>
+                    <li><strong>Fatores que influenciam o desempenho:</strong> Discussão sobre fatores que influenciam o desempenho</li>
+                    <li><strong>Limitações observadas:</strong> Escalas de tempo e espaço, estabilidade de resultados, redundância, etc.</li>
+                    <li><strong>Cenários de uso recomendados:</strong> Contextos de uso</li>
+                </ul>
+
+                <h3>6. Conclusão</h3>
+                <p>Síntese dos principais achados, lições aprendidas e sugestões para trabalhos futuros.</p>
+                <div class="highlight-box">
+                    <h4>🎯 Lembre-se</h4>
+                    <p>O objetivo não é apenas implementar o algoritmo, mas <strong>compreender profundamente</strong> seu comportamento. A qualidade da análise crítica entre teoria e prática será o diferencial para notas excelentes!</p>
+                </div>
+
+                <h3>7. Referências</h3>
+                <p>Bibliografia acadêmica e fontes utilizadas (padrão ABNT).</p>
+            </div>
+
+            <div class="section">
+                <h2><span class="icon">📖</span>Exemplo Completo: Bubble Sort</h2>
+                <p><em>Este exemplo está disponível como referência para estrutura e formato. Note que o Bubble Sort <strong>NÃO</strong> está na lista de algoritmos válidos para o trabalho.</em></p>
+                
+                <div style="background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 10px; padding: 25px; margin: 20px 0;">
+                    <h3 style="color: #2c3e50; margin-bottom: 20px; text-align: center;">📊 Análise Matemática e Empírica do Algoritmo Bubble Sort</h3>
+                    
+                    <div style="background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                        <h4 style="color: #34495e;">1. Introdução</h4>
+                        <p>O algoritmo Bubble Sort é um método simples de ordenação que repete múltiplas passagens por uma lista, comparando elementos adjacentes e trocando-os se estiverem fora de ordem. É frequentemente usado como exemplo introdutório devido à sua simplicidade, embora seja ineficiente para grandes volumes de dados.</p>
+                        
+                        <p>Este trabalho analisa a complexidade matemática e o desempenho empírico do algoritmo, demonstrando como a análise teórica se relaciona com os resultados práticos obtidos através de implementação e medições computacionais.</p>
+
+                        <div class="complexity-box">
+                            <h3>Complexidades do Bubble Sort</h3>
+                            <p><strong>Melhor Caso:</strong> O(n) - Lista já ordenada com otimização</p>
+                            <p><strong>Pior Caso:</strong> O(n²) - Lista inversamente ordenada</p>
+                            <p><strong>Caso Médio:</strong> O(n²) - Lista aleatória</p>
+                        </div>
+                    </div>
+
+                    <div style="background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                        <h4 style="color: #34495e;">2. Descrição do Algoritmo</h4>
+                        
+                        <h5><strong>Implementação Java:</strong></h5>
+
+                        <h6><strong>Versão Básica</strong></h6>
+                        <pre><code><span class="annotation">/**
+ * Implementação básica do Bubble Sort
+ * Complexidade: O(n²) em todos os casos
+ */</span>
+<span class="keyword">public</span> <span class="keyword">class</span> <span class="type">BubbleSort</span> {
+    
+    <span class="keyword">public</span> <span class="keyword">static</span> <span class="type">void</span> <span class="function">bubbleSortBasico</span>(<span class="type">int</span>[] <span class="variable">array</span>) {
+        <span class="type">int</span> <span class="variable">n</span> <span class="operator">=</span> <span class="variable">array</span>.<span class="variable">length</span>;
+        
+        <span class="comment">// Realizar n-1 passagens</span>
+        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; <span class="variable">i</span> <span class="operator">&lt;</span> <span class="variable">n</span>; <span class="variable">i</span><span class="operator">++</span>) {
+            <span class="comment">// Comparar elementos adjacentes</span>
+            <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">j</span> <span class="operator">=</span> <span class="number">0</span>; <span class="variable">j</span> <span class="operator">&lt;</span> <span class="variable">n</span> <span class="operator">-</span> <span class="variable">i</span> <span class="operator">-</span> <span class="number">1</span>; <span class="variable">j</span><span class="operator">++</span>) {
+                <span class="keyword">if</span> (<span class="variable">array</span>[<span class="variable">j</span>] <span class="operator">></span> <span class="variable">array</span>[<span class="variable">j</span> <span class="operator">+</span> <span class="number">1</span>]) {
+                    <span class="comment">// Trocar elementos fora de ordem</span>
+                    <span class="type">int</span> <span class="variable">temp</span> <span class="operator">=</span> <span class="variable">array</span>[<span class="variable">j</span>];
+                    <span class="variable">array</span>[<span class="variable">j</span>] <span class="operator">=</span> <span class="variable">array</span>[<span class="variable">j</span> <span class="operator">+</span> <span class="number">1</span>];
+                    <span class="variable">array</span>[<span class="variable">j</span> <span class="operator">+</span> <span class="number">1</span>] <span class="operator">=</span> <span class="variable">temp</span>;
+                }
+            }
+        }
+    }
+}</code></pre>
+
+                        <h6><strong>Versão Otimizada</strong></h6>
+                        <pre><code><span class="annotation">/**
+ * Bubble Sort com otimização de parada precoce
+ * Melhor caso: O(n), Pior caso: O(n²)
+ */</span>
+<span class="keyword">public</span> <span class="keyword">static</span> <span class="type">void</span> <span class="function">bubbleSortOtimizado</span>(<span class="type">int</span>[] <span class="variable">array</span>) {
+    <span class="type">int</span> <span class="variable">n</span> <span class="operator">=</span> <span class="variable">array</span>.<span class="variable">length</span>;
+    
+    <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; <span class="variable">i</span> <span class="operator">&lt;</span> <span class="variable">n</span> <span class="operator">-</span> <span class="number">1</span>; <span class="variable">i</span><span class="operator">++</span>) {
+        <span class="type">boolean</span> <span class="variable">trocou</span> <span class="operator">=</span> <span class="keyword">false</span>; <span class="comment">// Flag para detectar se houve troca</span>
+        
+        <span class="comment">// Reduzir área de comparação a cada passagem</span>
+        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">j</span> <span class="operator">=</span> <span class="number">0</span>; <span class="variable">j</span> <span class="operator">&lt;</span> <span class="variable">n</span> <span class="operator">-</span> <span class="variable">i</span> <span class="operator">-</span> <span class="number">1</span>; <span class="variable">j</span><span class="operator">++</span>) {
+            <span class="keyword">if</span> (<span class="variable">array</span>[<span class="variable">j</span>] <span class="operator">></span> <span class="variable">array</span>[<span class="variable">j</span> <span class="operator">+</span> <span class="number">1</span>]) {
+                <span class="comment">// Trocar elementos</span>
+                <span class="type">int</span> <span class="variable">temp</span> <span class="operator">=</span> <span class="variable">array</span>[<span class="variable">j</span>];
+                <span class="variable">array</span>[<span class="variable">j</span>] <span class="operator">=</span> <span class="variable">array</span>[<span class="variable">j</span> <span class="operator">+</span> <span class="number">1</span>];
+                <span class="variable">array</span>[<span class="variable">j</span> <span class="operator">+</span> <span class="number">1</span>] <span class="operator">=</span> <span class="variable">temp</span>;
+                <span class="variable">trocou</span> <span class="operator">=</span> <span class="keyword">true</span>;
+            }
+        }
+        
+        <span class="comment">// Se não houve troca, array está ordenado</span>
+        <span class="keyword">if</span> (<span class="operator">!</span><span class="variable">trocou</span>) {
+            <span class="keyword">break</span>;
+        }
+    }
+}</code></pre>
+
+                        <h5><strong>Explicação Passo-a-Passo:</strong></h5>
+                        <ul>
+                            <li>O algoritmo realiza até <strong>n-1 passagens</strong> completas sobre o vetor</li>
+                            <li>Em cada passagem, compara elementos adjacentes da esquerda para a direita</li>
+                            <li>Se um par está fora de ordem, realiza a troca dos elementos</li>
+                            <li>Após cada passagem, o maior elemento "flutua" para sua posição final</li>
+                            <li>A otimização com flag evita passagens desnecessárias quando a lista já está ordenada</li>
+                        </ul>
+
+                        <h5><strong>Exemplo Prático de Execução (animação)</strong></h5>
+                        <div class="animation-container">
+                            <h4>🎬 Visualização do Bubble Sort</h4>
+                            <p>Acompanhe o algoritmo ordenando o vetor passo a passo:</p>
+                            
+                            <div class="array-container" id="arrayContainer">
+                                <!-- Elementos serão gerados dinamicamente -->
+                            </div>
+
+                            <div class="controls">
+                                <button class="btn btn-primary" onclick="generateArray()">🔄 Novo Array</button>
+                                <button class="btn btn-success" onclick="startSort()">▶️ Iniciar</button>
+                                <button class="btn btn-warning" onclick="pauseSort()">⏸️ Pausar</button>
+                                <button class="btn btn-danger" onclick="resetSort()">🔄 Resetar</button>
+                                <input type="range" id="speedSlider" min="1" max="10" value="5" style="margin: 0 10px;">
+                                <span>Velocidade</span>
+                            </div>
+
+                            <div class="status" id="status">
+                                Status: Pronto para iniciar | Passagem: 0 | Comparações: 0 | Trocas: 0
+                            </div>
+
+                            <div style="margin-top: 15px;">
+                                <span style="background: #3498db; color: white; padding: 5px 10px; border-radius: 4px; margin: 0 5px;">Normal</span>
+                                <span style="background: #e74c3c; color: white; padding: 5px 10px; border-radius: 4px; margin: 0 5px;">Comparando</span>
+                                <span style="background: #f39c12; color: white; padding: 5px 10px; border-radius: 4px; margin: 0 5px;">Trocando</span>
+                                <span style="background: #27ae60; color: white; padding: 5px 10px; border-radius: 4px; margin: 0 5px;">Ordenado</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                        <h4 style="color: #34495e;">3. Análise Matemática de Complexidade</h4>
+                        
+                        <h5><strong>Análise de Custo Linha por Linha</strong></h5>
+                        <div style="background: #f8f9fa; border: 2px solid #dee2e6; border-radius: 10px; padding: 25px; margin: 20px 0;">
+                            <h6 style="color: #2c3e50; margin-bottom: 15px; text-align: center;">📊 Mapeamento Código ↔ Custos Computacionais</h6>
+                            
+                            <table style="width: 100%; border-collapse: collapse; font-family: 'Courier New', monospace; font-size: 0.9em;">
+                                <thead>
+                                    <tr style="background: #34495e; color: white;">
+                                        <th style="padding: 12px; text-align: left; border: 1px solid #ddd; width: 65%;">Linha de Código</th>
+                                        <th style="padding: 12px; text-align: left; border: 1px solid #ddd; width: 35%;">Custo Computacional</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr style="background: #ffffff;">
+                                        <td style="padding: 12px; border: 1px solid #ddd; font-family: 'Courier New', monospace; text-align: left;">
+                                            <div style="text-align: left;">
+                                                <code><span class="type">int</span> <span class="variable">n</span> <span class="operator">=</span> <span class="variable">array</span>.<span class="variable">length</span>;</code>
+                                            </div>
+                                        </td>
+                                        <td style="padding: 12px; border: 1px solid #ddd; color: #e74c3c; font-weight: bold;">
+                                            Atribuição: <strong>1</strong>
+                                        </td>
+                                    </tr>
+                                    <tr style="background: #f8f9fa;">
+                                        <td style="padding: 12px; border: 1px solid #ddd; font-family: 'Courier New', monospace; text-align: left;">
+                                            <div style="text-align: left;">
+                                                <code><span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; <span class="variable">i</span> <span class="operator">&lt;</span> <span class="variable">n</span> <span class="operator">-</span> <span class="number">1</span>; <span class="variable">i</span><span class="operator">++</span>) {</code>
+                                            </div>
+                                        </td>
+                                        <td style="padding: 12px; border: 1px solid #ddd; color: #e74c3c; font-weight: bold;">
+                                            Inicialização: <strong>1</strong><br>
+                                            Comparação Inicial: <strong>1</strong><br>
+                                            Comparação: <strong>(n-1)</strong><br>
+                                            Incremento: <strong>(n-1)</strong>
+                                        </td>
+                                    </tr>
+                                    <tr style="background: #ffffff;">
+                                        <td style="padding: 12px; border: 1px solid #ddd; font-family: 'Courier New', monospace; text-align: left;">
+                                            <div style="margin-left: 20px; border-left: 2px solid #3498db; padding-left: 10px; text-align: left;">
+                                                <code><span class="type">boolean</span> <span class="variable">trocou</span> <span class="operator">=</span> <span class="keyword">false</span>;</code>
+                                            </div>
+                                        </td>
+                                        <td style="padding: 12px; border: 1px solid #ddd; color: #e74c3c; font-weight: bold;">
+                                            Atribuição: <strong>(n-1)</strong>
+                                        </td>
+                                    </tr>
+                                    <tr style="background: #f8f9fa;">
+                                        <td style="padding: 12px; border: 1px solid #ddd; font-family: 'Courier New', monospace; text-align: left;">
+                                            <div style="margin-left: 20px; border-left: 2px solid #3498db; padding-left: 10px; text-align: left;">
+                                                <code><span class="keyword">for</span> (<span class="type">int</span> <span class="variable">j</span> <span class="operator">=</span> <span class="number">0</span>; <span class="variable">j</span> <span class="operator">&lt;</span> <span class="variable">n</span> <span class="operator">-</span> <span class="variable">i</span> <span class="operator">-</span> <span class="number">1</span>; <span class="variable">j</span><span class="operator">++</span>) {</code>
+                                            </div>
+                                        </td>
+                                        <td style="padding: 12px; border: 1px solid #ddd; color: #e74c3c; font-weight: bold;">
+                                            <strong>for:</strong>Σ[2(n-i-1)+1] = n(n-1)/2<br>
+                                            Inicialização: <strong>(n-1)</strong><br>
+                                            Comparação Inicial: <strong>(n-1)</strong><br>
+                                            Comparação: <strong>n(n-1)/2</strong><br>
+                                            Incremento: <strong>n(n-1)/2</strong>
+                                        </td>
+                                    </tr>
+                                    <tr style="background: #ffffff;">
+                                        <td style="padding: 12px; border: 1px solid #ddd; font-family: 'Courier New', monospace; text-align: left;">
+                                            <div style="margin-left: 40px; border-left: 2px solid #9b59b6; padding-left: 10px; text-align: left;">
+                                                <code><span class="keyword">if</span> (<span class="variable">array</span>[<span class="variable">j</span>] <span class="operator">></span> <span class="variable">array</span>[<span class="variable">j</span> <span class="operator">+</span> <span class="number">1</span>]) {</code>
+                                            </div>
+                                        </td>
+                                        <td style="padding: 12px; border: 1px solid #ddd; color: #e74c3c; font-weight: bold;">
+                                            Comparação: <strong>n(n-1)/2</strong>
+                                        </td>
+                                    </tr>
+                                    <tr style="background: #f8f9fa;">
+                                        <td style="padding: 12px; border: 1px solid #ddd; font-family: 'Courier New', monospace; text-align: left;">
+                                            <div style="margin-left: 60px; border-left: 2px solid #e74c3c; padding-left: 10px; text-align: left;">
+                                                <code><span class="type">int</span> <span class="variable">temp</span> <span class="operator">=</span> <span class="variable">array</span>[<span class="variable">j</span>];</code>
+                                            </div>
+                                        </td>
+                                        <td style="padding: 12px; border: 1px solid #ddd; color: #e74c3c; font-weight: bold;" rowspan="4">
+                                            Atribuição: <strong>4 x n(n-1)/2</strong>
+                                        </td>
+                                    </tr>
+                                    <tr style="background: #ffffff;">
+                                        <td style="padding: 12px; border: 1px solid #ddd; font-family: 'Courier New', monospace; text-align: left;">
+                                            <div style="margin-left: 60px; border-left: 2px solid #e74c3c; padding-left: 10px; text-align: left;">
+                                                <code><span class="variable">array</span>[<span class="variable">j</span>] <span class="operator">=</span> <span class="variable">array</span>[<span class="variable">j</span> <span class="operator">+</span> <span class="number">1</span>];</code>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr style="background: #f8f9fa;">
+                                        <td style="padding: 12px; border: 1px solid #ddd; font-family: 'Courier New', monospace; text-align: left;">
+                                            <div style="margin-left: 60px; border-left: 2px solid #e74c3c; padding-left: 10px; text-align: left;">
+                                                <code><span class="variable">array</span>[<span class="variable">j</span> <span class="operator">+</span> <span class="number">1</span>] <span class="operator">=</span> <span class="variable">temp</span>;</code>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr style="background: #ffffff;">
+                                        <td style="padding: 12px; border: 1px solid #ddd; font-family: 'Courier New', monospace; text-align: left;">
+                                            <div style="margin-left: 60px; border-left: 2px solid #e74c3c; padding-left: 10px; text-align: left;">
+                                                <code><span class="variable">trocou</span> <span class="operator">=</span> <span class="keyword">true</span>;</code>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr style="background: #f8f9fa;">
+                                        <td style="padding: 12px; border: 1px solid #ddd; font-family: 'Courier New', monospace; text-align: left;">
+                                            <div style="margin-left: 20px; border-left: 2px solid #3498db; padding-left: 10px; text-align: left;">
+                                                <code><span class="keyword">if</span> (<span class="operator">!</span><span class="variable">trocou</span>) {</code>
+                                            </div>
+                                        </td>
+                                        <td style="padding: 12px; border: 1px solid #ddd; color: #e74c3c; font-weight: bold;">
+                                            Comparação: <strong>(n-1)</strong>
+                                        </td>
+                                    </tr>
+                                    <tr style="background: #ffffff;">
+                                        <td style="padding: 12px; border: 1px solid #ddd; font-family: 'Courier New', monospace; text-align: left;">
+                                            <div style="margin-left: 40px; border-left: 2px solid #27ae60; padding-left: 10px; text-align: left;">
+                                                <code><span class="keyword">break</span>;</code>
+                                            </div>
+                                        </td>
+                                        <td style="padding: 12px; border: 1px solid #ddd; color: #27ae60; font-weight: bold;">
+                                            <strong>1</strong> (melhor caso)
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            
+                            <div style="background: #fff; border: 2px solid #e74c3c; border-radius: 8px; padding: 20px; margin-top: 20px;">
+                                <h6 style="color: #e74c3c; margin-bottom: 10px;">🔴 PIOR CASO (Array Invertido):</h6>
+                                <p style="font-family: 'Courier New', monospace; margin: 5px 0; font-size: 0.9em;">
+                                    f(n) = 1 + 1 + n + (n−1) + (n−1) + n(n−1)/2 ​+ (n−1) + n(n−1)/2​ + 3n(n−1)/2​ + n(n−1)/2 ​+ (n−1)
+                                </p>
+                                <p style="font-family: 'Courier New', monospace; margin: 5px 0; font-weight: bold; color: #e74c3c;">
+                                    <strong>f(n) = 3n² + 3n - 3 = O(n²)</strong>
+                                </p>
+                            </div>
+                            
+                            <div style="background: #fff; border: 2px solid #27ae60; border-radius: 8px; padding: 20px; margin-top: 15px;">
+                                <h6 style="color: #27ae60; margin-bottom: 10px;">🟢 MELHOR CASO (Array Ordenado):</h6>
+                                <p style="font-family: 'Courier New', monospace; margin: 5px 0; font-size: 0.9em;">
+                                    Apenas uma passagem: f(n) = 1 + 3 + 1 + 2n + (n−1) + 1 + 1
+                                </p>
+                                <p style="font-family: 'Courier New', monospace; margin: 5px 0; font-weight: bold; color: #27ae60;">
+                                    <strong>f(n) = 3n + 6 = O(n)</strong>
+                                </p>
+                            </div>
+                        </div>
+
+                        <h5><strong>Notações Assintóticas</strong></h5>
+                        <div class="formula">
+                            <strong>Big-O (limite superior):</strong> f(n) ∈ O(n²)<br>
+                            <strong>Omega (limite inferior):</strong> f(n) ∈ Ω(n)<br>
+                            <strong>Theta (ordem exata):</strong> f(n) ∈ Θ(n²) para o caso médio
+                        </div>
+
+                        <h5><strong>Complexidade de Tempo</strong></h5>
+                        <div class="complexity-analysis">
+                            <h4>📈 Resumo da Análise por Casos</h4>
+                            
+                            <p><strong>Melhor Caso (array já ordenado com otimização):</strong></p>
+                            <ul>
+                                <li>Uma única passagem: 3n + 6 instruções</li>
+                                <li>Nenhuma troca é realizada</li>
+                                <li>Flag detecta que array está ordenado</li>
+                                <li><strong>Complexidade:</strong> O(n)</li>
+                            </ul>
+
+                            <p><strong>Pior Caso (array inversamente ordenado):</strong></p>
+                            <ul>
+                                <li>Todas as passagens necessárias: 3n² + 2n - 2 instruções</li>
+                                <li>Máximo número de trocas: n(n-1)/2</li>
+                                <li>Máximo número de comparações: n(n-1)/2</li>
+                                <li><strong>Complexidade:</strong> O(n²)</li>
+                            </ul>
+
+                            <p><strong>Caso Médio (distribuição aleatória):</strong></p>
+                            <ul>
+                                <li>Em média, metade dos pares precisa ser trocada</li>
+                                <li>Número de comparações permanece O(n²)</li>
+                                <li>Número médio de trocas: n²/4</li>
+                                <li><strong>Complexidade:</strong> O(n²)</li>
+                            </ul>
+
+                        </div>
+
+                        <div style="background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                            <h4 style="color: #34495e;">4. Análise Empírica</h4>
+
+                            <h5><strong>Configuração dos Testes</strong></h5>
+                            <ul>
+                                <li><strong>Hardware:</strong> Intel Core i7-10750H, 16 GB RAM DDR4</li>
+                                <li><strong>Sistema Operacional:</strong> Ubuntu 22.04 LTS</li>
+                                <li><strong>Linguagem:</strong> Java 17 (OpenJDK)</li>
+                                <li><strong>Medição:</strong> System.nanoTime() com 10 execuções por teste</li>
+                                <li><strong>Metodologia:</strong> Média aritmética dos tempos, descarte de outliers</li>
+                            </ul>
+
+                            <h5><strong>Conjuntos de Teste</strong></h5>
+                            <ul>
+                                <li><strong>Tamanhos:</strong> 100, 500, 1000, 2000, 5000 elementos</li>
+                                <li><strong>Tipos de entrada:</strong>
+                                    <ul>
+                                        <li>Array aleatório (Random.nextInt)</li>
+                                        <li>Array ordenado crescente</li>
+                                        <li>Array ordenado decrescente</li>
+                                        <li>Array parcialmente ordenado (70% ordenado)</li>
+                                    </ul>
+                                </li>
+                            </ul>
+
+                            <h5><strong>Resultados Experimentais (Tempo de Execução em Segundos)</strong></h5>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Tamanho (n)</th>
+                                        <th>Aleatório (s)</th>
+                                        <th>Ordenado (s)</th>
+                                        <th>Invertido (s)</th>
+                                        <th>Parcial (s)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>100</td>
+                                        <td>0.0012</td>
+                                        <td>0.0002</td>
+                                        <td>0.0024</td>
+                                        <td>0.0008</td>
+                                    </tr>
+                                    <tr>
+                                        <td>500</td>
+                                        <td>0.027</td>
+                                        <td>0.003</td>
+                                        <td>0.054</td>
+                                        <td>0.018</td>
+                                    </tr>
+                                    <tr>
+                                        <td>1000</td>
+                                        <td>0.115</td>
+                                        <td>0.008</td>
+                                        <td>0.228</td>
+                                        <td>0.074</td>
+                                    </tr>
+                                    <tr>
+                                        <td>2000</td>
+                                        <td>0.453</td>
+                                        <td>0.028</td>
+                                        <td>0.918</td>
+                                        <td>0.298</td>
+                                    </tr>
+                                    <tr>
+                                        <td>5000</td>
+                                        <td>2.847</td>
+                                        <td>0.074</td>
+                                        <td>5.721</td>
+                                        <td>1.892</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <h5><strong>Visualização Gráfica dos Resultados</strong></h5>
+                            <div class="chart-container">
+                                <canvas id="performanceChart"></canvas>
+                            </div>
+
+                            <h5><strong>Métricas de Operações</strong></h5>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Tamanho (n)</th>
+                                        <th>Comparações (Teórico)</th>
+                                        <th>Comparações (Medido)</th>
+                                        <th>Trocas (Pior Caso)</th>
+                                        <th>Trocas (Caso Médio)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>100</td>
+                                        <td>4.950</td>
+                                        <td>4.950</td>
+                                        <td>4.950</td>
+                                        <td>2.475</td>
+                                    </tr>
+                                    <tr>
+                                        <td>500</td>
+                                        <td>124.750</td>
+                                        <td>124.750</td>
+                                        <td>124.750</td>
+                                        <td>62.375</td>
+                                    </tr>
+                                    <tr>
+                                        <td>1000</td>
+                                        <td>499.500</td>
+                                        <td>499.500</td>
+                                        <td>499.500</td>
+                                        <td>249.750</td>
+                                    </tr>
+                                    <tr>
+                                        <td>2000</td>
+                                        <td>1.999.000</td>
+                                        <td>1.999.000</td>
+                                        <td>1.999.000</td>
+                                        <td>999.500</td>
+                                    </tr>
+                                    <tr>
+                                        <td>5000</td>
+                                        <td>12.497.500</td>
+                                        <td>12.497.500</td>
+                                        <td>12.497.500</td>
+                                        <td>6.248.750</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div style="background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                            <h4 style="color: #34495e;">5. Discussão e Comparação</h4>
+
+                            <h5><strong>Validação da Análise Teórica</strong></h5>
+                            <ul>
+                                <li>Os resultados empíricos confirmam precisamente a análise matemática</li>
+                                <li>O crescimento quadrático é evidente: dobrar o tamanho multiplica o tempo por ~4</li>
+                                <li>A otimização com flag de parada mostra dramática melhoria para listas ordenadas</li>
+                                <li>Número de operações medidas coincide exatamente com as previsões teóricas</li>
+                            </ul>
+
+                            <h5><strong>Fatores que Influenciam o Desempenho</strong></h5>
+                            <ul>
+                                <li><strong>Ordem inicial dos dados:</strong> Array ordenado executa em O(n), array invertido em O(n²)</li>
+                                <li><strong>Implementação da linguagem:</strong> Java oferece melhor performance que linguagens interpretadas</li>
+                                <li><strong>Cache do processador:</strong> Acesso sequencial favorece a performance</li>
+                                <li><strong>Operações de troca:</strong> Atribuições são mais custosas que comparações</li>
+                            </ul>
+
+                            <h5><strong>Limitações Observadas</strong></h5>
+                            <ul>
+                                <li>Escalabilidade extremamente limitada para grandes volumes (n > 10.000)</li>
+                                <li>Não é estável por natureza (implementações podem quebrar estabilidade)</li>
+                                <li>Muitas operações redundantes mesmo com otimizações simples</li>
+                                <li>Não aproveita estruturas já parcialmente ordenadas de forma eficiente</li>
+                            </ul>
+
+                            <h5><strong>Cenários de Uso Recomendados</strong></h5>
+                            <ul>
+                                <li><strong>Educação:</strong> Excelente para ensinar conceitos de ordenação</li>
+                                <li><strong>Arrays pequenos:</strong> n < 50, onde simplicidade supera eficiência</li>
+                                <li><strong>Implementações embarcadas:</strong> Quando memória é extremamente limitada</li>
+                                <li><strong>Detecção de ordenação:</strong> Aproveitar a otimização para verificar se array está ordenado</li>
+                            </ul>
+                        </div>
+
+                        <div style="background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                            <h4 style="color: #34495e;">6. Conclusão</h4>
+                            
+                            <p>A análise completa do Bubble Sort demonstra a perfeita correspondência entre teoria e prática na análise de algoritmos. As previsões matemáticas de complexidade O(n²) foram validadas precisamente pelos experimentos empíricos, confirmando a importância da análise assintótica.</p>
+
+                            <p>O algoritmo serve como excelente exemplo didático para ilustrar conceitos fundamentais:</p>
+                            <ul>
+                                <li>Como pequenas otimizações (flag de parada) podem gerar grandes impactos práticos</li>
+                                <li>A diferença crítica entre melhor e pior caso em algoritmos</li>
+                                <li>Por que a eficiência assintótica importa: diferenças dramáticas para grandes entradas</li>
+                                <li>Como a implementação e o hardware influenciam constantes multiplicativas</li>
+                            </ul>
+
+                            <p>Embora inadequado para uso em produção com grandes volumes de dados, o Bubble Sort permanece relevante como ferramenta educacional e para aplicações muito específicas onde simplicidade de implementação supera considerações de performance.</p>
+
+                            <div class="complexity-box">
+                                <strong>Lição Principal:</strong> A análise de complexidade matemática é uma ferramenta poderosa e precisa para prever o comportamento real de algoritmos, fundamentando decisões de design de software.
+                            </div>
+                        </div>
+
+                        <div style="background: white; padding: 20px; border-radius: 8px;">
+                            <h4 style="color: #34495e;">7. Referências</h4>
+                            <ul>
+                                <li>Cormen, T. H., Leiserson, C. E., Rivest, R. L., & Stein, C. (2009). <em>Introduction to Algorithms</em>. 3rd Edition. MIT Press.</li>
+                                <li>Sedgewick, R., & Wayne, K. (2011). <em>Algorithms</em>. 4th Edition. Addison-Wesley Professional.</li>
+                                <li>Knuth, D. E. (1998). <em>The Art of Computer Programming, Volume 3: Sorting and Searching</em>. 2nd Edition. Addison-Wesley.</li>
+                                <li>Goodrich, M. T., & Tamassia, R. (2014). <em>Algorithm Design and Applications</em>. Wiley.</li>
+                                <li>Oracle Corporation. (2023). <em>Java SE 17 Documentation</em>. Disponível em: https://docs.oracle.com/en/java/javase/17/</li>
+                                <li>Ziviani, N. (2007). <em>Projeto de Algoritmos com Implementações em Pascal e C</em>. 3ª Edição. Cengage Learning.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Variáveis globais para a animação
+        let array = [];
+        let originalArray = [];
+        let isAnimating = false;
+        let isPaused = false;
+        let animationSpeed = 500;
+        let currentPass = 0;
+        let comparisons = 0;
+        let swaps = 0;
+
+        // Função para gerar novo array aleatório
+        function generateArray() {
+            if (isAnimating) return;
+            
+            array = [];
+            for (let i = 0; i < 8; i++) {
+                array.push(Math.floor(Math.random() * 50) + 10);
+            }
+            originalArray = [...array];
+            resetCounters();
+            renderArray();
+        }
+
+        // Função para renderizar o array
+        function renderArray() {
+            const container = document.getElementById('arrayContainer');
+            container.innerHTML = '';
+            
+            array.forEach((value, index) => {
+                const element = document.createElement('div');
+                element.className = 'array-element';
+                element.textContent = value;
+                element.style.height = (value * 2) + 'px';
+                element.id = `element-${index}`;
+                container.appendChild(element);
+            });
+        }
+
+        // Função para resetar contadores
+        function resetCounters() {
+            currentPass = 0;
+            comparisons = 0;
+            swaps = 0;
+            updateStatus();
+        }
+
+        // Função para atualizar status
+        function updateStatus() {
+            const status = document.getElementById('status');
+            status.textContent = `Status: ${isAnimating ? (isPaused ? 'Pausado' : 'Executando') : 'Pronto'} | Passagem: ${currentPass} | Comparações: ${comparisons} | Trocas: ${swaps}`;
+        }
+
+        // Função para destacar elementos sendo comparados
+        function highlightElements(i, j, className) {
+            return new Promise(resolve => {
+                const element1 = document.getElementById(`element-${i}`);
+                const element2 = document.getElementById(`element-${j}`);
+                
+                // Remover classes anteriores
+                document.querySelectorAll('.array-element').forEach(el => {
+                    el.classList.remove('comparing', 'swapping');
+                });
+                
+                // Adicionar nova classe
+                element1.classList.add(className);
+                element2.classList.add(className);
+                
+                setTimeout(resolve, animationSpeed);
+            });
+        }
+
+        // Função para trocar elementos
+        function swapElements(i, j) {
+            return new Promise(resolve => {
+                [array[i], array[j]] = [array[j], array[i]];
+                renderArray();
+                
+                const element1 = document.getElementById(`element-${i}`);
+                const element2 = document.getElementById(`element-${j}`);
+                element1.classList.add('swapping');
+                element2.classList.add('swapping');
+                
+                swaps++;
+                updateStatus();
+                
+                setTimeout(resolve, animationSpeed);
+            });
+        }
+
+        // Função para marcar elemento como ordenado
+        function markAsSorted(index) {
+            const element = document.getElementById(`element-${index}`);
+            element.classList.add('sorted');
+        }
+
+        // Função principal do Bubble Sort animado
+        async function bubbleSortAnimation() {
+            const n = array.length;
+            
+            for (let i = 0; i < n - 1; i++) {
+                if (!isAnimating) return;
+                
+                currentPass = i + 1;
+                updateStatus();
+                
+                let swapped = false;
+                
+                for (let j = 0; j < n - i - 1; j++) {
+                    if (!isAnimating) return;
+                    
+                    // Aguardar se pausado
+                    while (isPaused && isAnimating) {
+                        await new Promise(resolve => setTimeout(resolve, 100));
+                    }
+                    
+                    comparisons++;
+                    await highlightElements(j, j + 1, 'comparing');
+                    
+                    if (array[j] > array[j + 1]) {
+                        await swapElements(j, j + 1);
+                        swapped = true;
+                    }
+                    
+                    // Remover destaque
+                    document.querySelectorAll('.array-element').forEach(el => {
+                        el.classList.remove('comparing', 'swapping');
+                    });
+                }
+                
+                // Marcar último elemento como ordenado
+                markAsSorted(n - i - 1);
+                
+                // Se não houve troca, array está ordenado
+                if (!swapped) break;
+            }
+            
+            // Marcar todos como ordenados
+            for (let i = 0; i < n; i++) {
+                markAsSorted(i);
+            }
+            
+            isAnimating = false;
+            updateStatus();
+        }
+
+        // Funções de controle
+        function startSort() {
+            if (isAnimating && isPaused) {
+                isPaused = false;
+                updateStatus();
+                return;
+            }
+            
+            if (isAnimating) return;
+            
+            isAnimating = true;
+            isPaused = false;
+            bubbleSortAnimation();
+        }
+
+        function pauseSort() {
+            if (isAnimating) {
+                isPaused = !isPaused;
+                updateStatus();
+            }
+        }
+
+        function resetSort() {
+            isAnimating = false;
+            isPaused = false;
+            array = [...originalArray];
+            resetCounters();
+            renderArray();
+        }
+
+        // Controle de velocidade
+        document.getElementById('speedSlider').addEventListener('input', function(e) {
+            animationSpeed = 1100 - (parseInt(e.target.value) * 100);
+        });
+
+        // Inicializar
+        generateArray();
+
+        // Gráfico de performance
+        const ctx = document.getElementById('performanceChart').getContext('2d');
+        const performanceChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['100', '500', '1000', '2000', '5000'],
+                datasets: [{
+                    label: 'Lista Aleatória (s)',
+                    data: [0.0012, 0.027, 0.115, 0.453, 2.847],
+                    borderColor: '#e74c3c',
+                    backgroundColor: 'rgba(231, 76, 60, 0.1)',
+                    tension: 0.4
+                }, {
+                    label: 'Lista Ordenada (s)',
+                    data: [0.0002, 0.003, 0.008, 0.028, 0.074],
+                    borderColor: '#27ae60',
+                    backgroundColor: 'rgba(39, 174, 96, 0.1)',
+                    tension: 0.4
+                }, {
+                    label: 'Lista Invertida (s)',
+                    data: [0.0024, 0.054, 0.228, 0.918, 5.721],
+                    borderColor: '#8e44ad',
+                    backgroundColor: 'rgba(142, 68, 173, 0.1)',
+                    tension: 0.4
+                }, {
+                    label: 'Lista Parcial (s)',
+                    data: [0.0008, 0.018, 0.074, 0.298, 1.892],
+                    borderColor: '#f39c12',
+                    backgroundColor: 'rgba(243, 156, 18, 0.1)',
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Desempenho do Bubble Sort por Tipo de Lista',
+                        font: {
+                            size: 16,
+                            weight: 'bold'
+                        }
+                    },
+                    legend: {
+                        position: 'top',
+                    }
+                },
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Tamanho da Lista (n)'
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Tempo de Execução (segundos)'
+                        },
+                        type: 'logarithmic'
+                    }
+                }
+            }
+        });
+    </script>
