@@ -213,8 +213,57 @@
          }
 
         .dual-image-item .content-image {
-            margin: 0;
-        }
+             margin: 0;
+         }
+
+         /* Modal para ampliação de imagens */
+         .image-modal {
+             display: none;
+             position: fixed;
+             z-index: 1000;
+             left: 0;
+             top: 0;
+             width: 100%;
+             height: 100%;
+             background-color: rgba(0, 0, 0, 0.9);
+             cursor: pointer;
+         }
+
+         .modal-content {
+             position: absolute;
+             top: 50%;
+             left: 50%;
+             transform: translate(-50%, -50%);
+             max-width: 90%;
+             max-height: 90%;
+             border-radius: 10px;
+             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+         }
+
+         .close-modal {
+             position: absolute;
+             top: 20px;
+             right: 30px;
+             color: white;
+             font-size: 40px;
+             font-weight: bold;
+             cursor: pointer;
+             z-index: 1001;
+             transition: color 0.3s;
+         }
+
+         .close-modal:hover {
+             color: #ccc;
+         }
+
+         .content-image {
+             cursor: pointer;
+             transition: transform 0.3s ease;
+         }
+
+         .content-image:hover {
+             transform: scale(1.05);
+         }
 
         .image-text {
             flex: 1;
@@ -390,6 +439,49 @@
             </div>
         </div>
     </div>
-</body>
 
+    <!-- Modal para ampliação de imagens -->
+    <div id="imageModal" class="image-modal">
+        <span class="close-modal">&times;</span>
+        <img class="modal-content" id="modalImage">
+    </div>
+
+    <script>
+        // Funcionalidade do modal de ampliação de imagens
+        document.addEventListener('DOMContentLoaded', function() {
+            const modal = document.getElementById('imageModal');
+            const modalImg = document.getElementById('modalImage');
+            const closeBtn = document.querySelector('.close-modal');
+            const images = document.querySelectorAll('.content-image');
+
+            // Adicionar evento de clique para cada imagem
+            images.forEach(function(img) {
+                img.addEventListener('click', function() {
+                    modal.style.display = 'block';
+                    modalImg.src = this.src;
+                    modalImg.alt = this.alt;
+                });
+            });
+
+            // Fechar modal ao clicar no X
+            closeBtn.addEventListener('click', function() {
+                modal.style.display = 'none';
+            });
+
+            // Fechar modal ao clicar fora da imagem
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+
+            // Fechar modal com a tecla ESC
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && modal.style.display === 'block') {
+                    modal.style.display = 'none';
+                }
+            });
+        });
+    </script>
+</body>
 </html>
