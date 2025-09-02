@@ -1,0 +1,1059 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tabela Hash com Encadeamento Separado</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .code-section {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        .code-header {
+            background: #2d3748;
+            color: white;
+            padding: 15px 20px;
+            margin: -20px -20px 20px -20px;
+            border-radius: 15px 15px 0 0;
+            font-weight: bold;
+        }
+
+        .code-content {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.4;
+            min-height: 350px;
+            overflow: visible;
+            white-space: pre-wrap;
+        }
+
+        .highlighted-line {
+            background-color: #4a5568;
+            animation: pulse 1s ease-in-out;
+        }
+
+        @keyframes pulse {
+            0% { background-color: #4a5568; }
+            50% { background-color: #2b6cb0; }
+            100% { background-color: #4a5568; }
+        }
+
+        .visualization-section {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            min-height: 500px;
+        }
+
+        .hash-table {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .table-container {
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+            justify-content: center;
+        }
+
+        .indices {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .index {
+            width: 40px;
+            height: 50px;
+            background: #4299e1;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            border-radius: 8px;
+            font-size: 18px;
+        }
+
+        .buckets {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .bucket {
+            min-height: 50px;
+            min-width: 200px;
+            background: #f7fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .bucket.inserting {
+            border-color: #48bb78;
+            background-color: #f0fff4;
+            transform: scale(1.05);
+        }
+
+        .bucket-items {
+            display: flex;
+            gap: 8px;
+        }
+
+        .item {
+            width: auto;
+            min-width: 40px;
+            max-width: 120px;
+            height: 30px;
+            background: #4299e1;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            font-weight: bold;
+            animation: slideIn 0.5s ease-out;
+            padding: 0 8px;
+            font-size: 12px;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+
+        .item.string {
+            background: #48bb78;
+        }
+
+        .item.produto {
+            background: #ed8936;
+            font-size: 10px;
+        }
+
+        select {
+            padding: 12px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 16px;
+            background: white;
+            cursor: pointer;
+            transition: border-color 0.3s ease;
+            margin-bottom: 10px;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: #4299e1;
+        }
+
+        input[type="text"] {
+            padding: 12px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 16px;
+            width: 250px;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="text"].produto-field {
+            width: 180px;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #4299e1;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .controls {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            text-align: center;
+        }
+
+        .controls h3 {
+            margin-bottom: 20px;
+            color: #2d3748;
+        }
+
+        .input-group {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .input-group.compact {
+            margin-bottom: 10px;
+        }
+
+        .controls-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .controls-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .control-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        input[type="number"] {
+            padding: 12px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 16px;
+            width: 140px;
+            text-align: center;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #4299e1;
+        }
+
+        button {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #4299e1, #3182ce);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 120px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(66, 153, 225, 0.4);
+        }
+
+        button:disabled {
+            background: #a0aec0;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .info-panel {
+            background: #edf2f7;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            text-align: left;
+        }
+
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .info-label {
+            font-weight: bold;
+            color: #4a5568;
+        }
+
+        .info-value {
+            color: #2d3748;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .hash-calculation {
+            background: #fff5f5;
+            border: 2px solid #feb2b2;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .table-container {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Tabela Hash com Encadeamento Separado</h1>
+            <p>Demonstração interativa da estrutura de dados e algoritmo de inserção</p>
+        </div>
+
+        <div class="main-content">
+            <div class="code-section">
+                <div class="code-header">Código Java - Método hash() e insere()</div>
+                <div class="code-content" id="codeContent">
+<span id="line1">private int hash(Valor valor) {</span>
+<span id="line2">    return (valor.hashCode() & 0x7fffffff) % m;</span>
+<span id="line3">}</span>
+<span id="line4"></span>
+<span id="line5">public void insere(Valor valor) {</span>
+<span id="line6">    if (valor == null) {</span>
+<span id="line7">        throw new NullPointerException();</span>
+<span id="line8">    }</span>
+<span id="line9"></span>
+<span id="line10">    // dobra o tamanho se necessário</span>
+<span id="line11">    if (n >= 10 * m) {</span>
+<span id="line12">        redimensiona(2 * m);</span>
+<span id="line13">    }</span>
+<span id="line14"></span>
+<span id="line15">    int i = hash(valor);</span>
+<span id="line16">    if (!st[i].contains(valor)) {</span>
+<span id="line17">        n++;</span>
+<span id="line18">        st[i].add(0, valor);</span>
+<span id="line19">    }</span>
+<span id="line20">}</span>
+                </div>
+            </div>
+
+            <div class="visualization-section">
+                <div class="code-header">Visualização da Tabela Hash</div>
+                <div class="hash-table">
+                    <div id="hashCalculation" class="hash-calculation" style="display: none;"></div>
+                    <div class="table-container">
+                        <div class="indices">
+                            <div class="index">0</div>
+                            <div class="index">1</div>
+                            <div class="index">2</div>
+                            <div class="index">3</div>
+                        </div>
+                        <div class="buckets" id="buckets">
+                            <div class="bucket" data-index="0">
+                                <div class="bucket-items"></div>
+                            </div>
+                            <div class="bucket" data-index="1">
+                                <div class="bucket-items"></div>
+                            </div>
+                            <div class="bucket" data-index="2">
+                                <div class="bucket-items"></div>
+                            </div>
+                            <div class="bucket" data-index="3">
+                                <div class="bucket-items"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <h3>Controles de Inserção</h3>
+            <div class="controls-row" style="justify-content: center; gap: 15px; flex-wrap: wrap;">
+                <label for="dataType">Tipo de Dados:</label>
+                <select id="dataType" onchange="changeDataType()">
+                    <option value="integer">Números Inteiros</option>
+                    <option value="string">Strings (Nomes)</option>
+                    <option value="produto">Objetos Produto</option>
+                </select>
+                
+                <div id="integerInput" style="display: flex; align-items: center; gap: 8px;">
+                    <input type="number" id="valueInput" placeholder="Valor Inteiro" min="1" max="999">
+                    <button onclick="insertValue()">Inserir Valor</button>
+                </div>
+                
+                <div id="stringInput" style="display: none; align-items: center; gap: 8px;">
+                    <input type="text" id="stringValueInput" placeholder="Nome (ex: João, Maria)" maxlength="20">
+                    <button onclick="insertStringValue()">Inserir String</button>
+                </div>
+                
+                <div id="produtoInput" style="display: none; align-items: center; gap: 8px;">
+                    <input type="text" id="produtoNome" class="produto-field" placeholder="Nome do Produto" maxlength="15">
+                    <input type="number" id="produtoPreco" placeholder="Preço" step="0.01" min="0">
+                    <input type="number" id="produtoQuantidade" placeholder="Quantidade" min="0">
+                    <button onclick="insertProdutoValue()">Inserir Produto</button>
+                </div>
+                
+                <button id="autoDemoBtn" onclick="autoDemo()" style="min-width: 180px;">Simulação Automática</button>
+                <button onclick="clearTable()" style="min-width: 140px;">Limpar Tabela</button>
+            </div>
+            
+            <div class="info-panel">
+                <div class="info-item">
+                    <span class="info-label">Tipo de Dados:</span>
+                    <span class="info-value" id="currentDataType">Integer</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Tamanho da Tabela (m):</span>
+                    <span class="info-value" id="tableSize">4</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Número de Elementos (n):</span>
+                    <span class="info-value" id="elementCount">0</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Fator de Carga (n/m):</span>
+                    <span class="info-value" id="loadFactor">0.00</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Redimensionar em:</span>
+                    <span class="info-value" id="resizeThreshold">40</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Código da Classe Produto -->
+        <div class="code-section">
+            <div class="code-header">Implementação da Classe Produto</div>
+            <div class="code-content" id="produtoCodeContent">
+<span id="produto-line1">public class Produto {</span>
+<span id="produto-line2">    private String nome;</span>
+<span id="produto-line3">    private double preco;</span>
+<span id="produto-line4">    private int quantidade;</span>
+<span id="produto-line5">    </span>
+<span id="produto-line6">    public Produto(String nome, double preco, int quantidade) {</span>
+<span id="produto-line7">        this.nome = nome;</span>
+<span id="produto-line8">        this.preco = preco;</span>
+<span id="produto-line9">        this.quantidade = quantidade;</span>
+<span id="produto-line10">    }</span>
+<span id="produto-line11">    </span>
+<span id="produto-line12">    // Implementação personalizada do hashCode</span>
+<span id="produto-line13">    @Override</span>
+<span id="produto-line14">    public int hashCode() {</span>
+<span id="produto-line15">        int hash = 7;</span>
+<span id="produto-line16">        hash = 31 * hash + (nome != null ? nome.hashCode() : 0);</span>
+<span id="produto-line17">        hash = 31 * hash + (int)(Double.doubleToLongBits(preco) ^ </span>
+<span id="produto-line18">                                (Double.doubleToLongBits(preco) >>> 32));</span>
+<span id="produto-line19">        hash = 31 * hash + quantidade;</span>
+<span id="produto-line20">        return hash;</span>
+<span id="produto-line21">    }</span>
+<span id="produto-line22">    </span>
+<span id="produto-line23">    @Override</span>
+<span id="produto-line24">    public boolean equals(Object obj) {</span>
+<span id="produto-line25">        if (this == obj) return true;</span>
+<span id="produto-line26">        if (obj == null || getClass() != obj.getClass()) return false;</span>
+<span id="produto-line27">        </span>
+<span id="produto-line28">        Produto produto = (Produto) obj;</span>
+<span id="produto-line29">        return Double.compare(produto.preco, preco) == 0 &&</span>
+<span id="produto-line30">               quantidade == produto.quantidade &&</span>
+<span id="produto-line31">               (nome != null ? nome.equals(produto.nome) : produto.nome == null);</span>
+<span id="produto-line32">    }</span>
+<span id="produto-line33">    </span>
+<span id="produto-line34">    @Override</span>
+<span id="produto-line35">    public String toString() {</span>
+<span id="produto-line36">        return nome + " (R$" + String.format("%.2f", preco) + </span>
+<span id="produto-line37">               ", qty:" + quantidade + ")";</span>
+<span id="produto-line38">    }</span>
+<span id="produto-line39">}</span>
+            </div>
+        </div>
+
+        <div class="controls">
+
+    <script>
+        // Classe Produto em JavaScript
+        class Produto {
+            constructor(nome, preco, quantidade) {
+                this.nome = nome;
+                this.preco = preco;
+                this.quantidade = quantidade;
+            }
+
+            hashCode() {
+                // Implementação similar ao Java
+                let hash = 7;
+                hash = 31 * hash + this.stringHashCode(this.nome || '');
+                hash = 31 * hash + this.doubleHashCode(this.preco);
+                hash = 31 * hash + this.quantidade;
+                return hash;
+            }
+
+            stringHashCode(str) {
+                let hash = 0;
+                for (let i = 0; i < str.length; i++) {
+                    hash = ((hash << 5) - hash + str.charCodeAt(i)) & 0xffffffff;
+                }
+                return hash;
+            }
+
+            doubleHashCode(value) {
+                // Simulação simplificada do hash de double do Java
+                return Math.floor(value * 1000) % 0x7fffffff;
+            }
+
+            toString() {
+                return `${this.nome} (R${this.preco.toFixed(2)}, qty:${this.quantidade})`;
+            }
+
+            equals(other) {
+                if (!(other instanceof Produto)) return false;
+                return this.nome === other.nome && 
+                       this.preco === other.preco && 
+                       this.quantidade === other.quantidade;
+            }
+        }
+
+        class HashTable {
+            constructor() {
+                this.m = 4; // tamanho da tabela
+                this.n = 0; // número de elementos
+                this.buckets = [[], [], [], []];
+                this.isInserting = false;
+                this.currentDataType = 'integer';
+            }
+
+            hash(value) {
+                let hashValue;
+                
+                if (typeof value === 'number') {
+                    // Para números, usa o próprio valor
+                    hashValue = Math.abs(value);
+                } else if (typeof value === 'string') {
+                    // Para strings, calcula hash similar ao Java
+                    hashValue = this.stringHashCode(value);
+                } else if (value instanceof Produto) {
+                    // Para objetos Produto, usa o método hashCode da classe
+                    hashValue = value.hashCode();
+                } else {
+                    hashValue = 0;
+                }
+                
+                return Math.abs(hashValue) % this.m;
+            }
+
+            stringHashCode(str) {
+                let hash = 0;
+                for (let i = 0; i < str.length; i++) {
+                    hash = ((hash << 5) - hash + str.charCodeAt(i)) & 0xffffffff;
+                }
+                return hash;
+            }
+
+            async insert(value) {
+                if (this.isInserting) return;
+                this.isInserting = true;
+
+                try {
+                    // Destacar linha do método hash
+                    this.highlightLine('line1');
+                    await this.delay(1000);
+                    this.highlightLine('line2');
+                    
+                    const index = this.hash(value);
+                    
+                    // Mostrar cálculo do hash
+                    this.showHashCalculation(value, index);
+                    await this.delay(1500);
+
+                    // Destacar início do método insere
+                    this.highlightLine('line5');
+                    await this.delay(800);
+                    
+                    // Verificar redimensionamento
+                    this.highlightLine('line11');
+                    await this.delay(800);
+                    
+                    if (this.n >= 10 * this.m) {
+                        this.highlightLine('line12');
+                        await this.delay(1000);
+                        this.resize(2 * this.m);
+                        // Recalcular o índice após redimensionamento
+                        const newIndex = this.hash(value);
+                        this.showHashCalculation(value, newIndex, true);
+                        await this.delay(1000);
+                    }
+
+                    // Calcular índice
+                    this.highlightLine('line15');
+                    await this.delay(800);
+                    
+                    // Verificar se já existe
+                    this.highlightLine('line16');
+                    await this.delay(800);
+                    
+                    if (!this.buckets[index].some(item => this.equals(item, value))) {
+                        // Incrementar contador
+                        this.highlightLine('line17');
+                        this.n++;
+                        this.updateInfo();
+                        await this.delay(800);
+                        
+                        // Inserir na lista
+                        this.highlightLine('line18');
+                        this.buckets[index].unshift(value);
+                        await this.insertAnimation(index, value);
+                        await this.delay(800);
+                    }
+
+                    this.hideHashCalculation();
+                } finally {
+                    this.isInserting = false;
+                }
+            }
+
+            equals(item1, item2) {
+                if (typeof item1 !== typeof item2) return false;
+                
+                if (item1 instanceof Produto && item2 instanceof Produto) {
+                    return item1.equals(item2);
+                }
+                
+                return item1 === item2;
+            }
+
+            async insertAnimation(bucketIndex, value) {
+                const bucket = document.querySelector(`[data-index="${bucketIndex}"]`);
+                const bucketItems = bucket.querySelector('.bucket-items');
+                
+                // Animar o bucket
+                bucket.classList.add('inserting');
+                
+                // Criar novo item
+                const item = document.createElement('div');
+                item.className = 'item';
+                
+                // Definir classe e conteúdo baseado no tipo
+                if (typeof value === 'string') {
+                    item.classList.add('string');
+                    item.textContent = value;
+                } else if (value instanceof Produto) {
+                    item.classList.add('produto');
+                    item.textContent = `${value.nome} R${value.preco.toFixed(2)}`;
+                    item.title = value.toString(); // Tooltip com informação completa
+                } else {
+                    item.textContent = value;
+                }
+                
+                // Inserir no início da lista (posição 0)
+                bucketItems.insertBefore(item, bucketItems.firstChild);
+                
+                await this.delay(500);
+                bucket.classList.remove('inserting');
+            }
+
+            resize(newSize) {
+                // Criar nova estrutura
+                const oldBuckets = [...this.buckets];
+                this.m = newSize;
+                this.buckets = Array.from({length: newSize}, () => []);
+                
+                // Rehash todos os elementos
+                for (let bucket of oldBuckets) {
+                    for (let value of bucket) {
+                        const newIndex = this.hash(value);
+                        this.buckets[newIndex].push(value);
+                    }
+                }
+                
+                this.updateVisualization();
+                this.updateInfo();
+            }
+
+            updateVisualization() {
+                const bucketsContainer = document.getElementById('buckets');
+                bucketsContainer.innerHTML = '';
+                
+                // Atualizar índices
+                const indicesContainer = document.querySelector('.indices');
+                indicesContainer.innerHTML = '';
+                
+                for (let i = 0; i < this.m; i++) {
+                    // Criar índice
+                    const indexDiv = document.createElement('div');
+                    indexDiv.className = 'index';
+                    indexDiv.textContent = i;
+                    indicesContainer.appendChild(indexDiv);
+                    
+                    // Criar bucket
+                    const bucketDiv = document.createElement('div');
+                    bucketDiv.className = 'bucket';
+                    bucketDiv.setAttribute('data-index', i);
+                    
+                    const bucketItems = document.createElement('div');
+                    bucketItems.className = 'bucket-items';
+                    
+                    // Adicionar itens
+                    for (let value of this.buckets[i]) {
+                        const item = document.createElement('div');
+                        item.className = 'item';
+                        
+                        if (typeof value === 'string') {
+                            item.classList.add('string');
+                            item.textContent = value;
+                        } else if (value instanceof Produto) {
+                            item.classList.add('produto');
+                            item.textContent = `${value.nome} R${value.preco.toFixed(2)}`;
+                            item.title = value.toString();
+                        } else {
+                            item.textContent = value;
+                        }
+                        
+                        bucketItems.appendChild(item);
+                    }
+                    
+                    bucketDiv.appendChild(bucketItems);
+                    bucketsContainer.appendChild(bucketDiv);
+                }
+            }
+
+            showHashCalculation(value, result, isResize = false) {
+                const calc = document.getElementById('hashCalculation');
+                const prefix = isResize ? 'Após redimensionamento - ' : '';
+                let calculation = '';
+                
+                if (typeof value === 'number') {
+                    calculation = `
+                        ${prefix}<strong>Cálculo do Hash (Integer):</strong><br>
+                        hash(${value}) = (${value}.hashCode() & 0x7fffffff) % ${this.m}<br>
+                        hash(${value}) = ${Math.abs(value)} % ${this.m} = <strong>${result}</strong>
+                    `;
+                } else if (typeof value === 'string') {
+                    const hashValue = this.stringHashCode(value);
+                    calculation = `
+                        ${prefix}<strong>Cálculo do Hash (String):</strong><br>
+                        hash("${value}") = "${value}".hashCode() % ${this.m}<br>
+                        hash("${value}") = ${Math.abs(hashValue)} % ${this.m} = <strong>${result}</strong>
+                    `;
+                } else if (value instanceof Produto) {
+                    const hashValue = value.hashCode();
+                    calculation = `
+                        ${prefix}<strong>Cálculo do Hash (Produto):</strong><br>
+                        hash(${value.nome}) = produto.hashCode() % ${this.m}<br>
+                        Combina: nome + preço + quantidade<br>
+                        hash = ${Math.abs(hashValue)} % ${this.m} = <strong>${result}</strong>
+                    `;
+                }
+                
+                calc.innerHTML = calculation;
+                calc.style.display = 'block';
+            }
+
+            hideHashCalculation() {
+                setTimeout(() => {
+                    document.getElementById('hashCalculation').style.display = 'none';
+                }, 2000);
+            }
+
+            highlightLine(lineId) {
+                // Remove highlight anterior
+                document.querySelectorAll('.highlighted-line').forEach(line => {
+                    line.classList.remove('highlighted-line');
+                });
+                
+                // Adiciona novo highlight
+                const line = document.getElementById(lineId);
+                if (line) {
+                    line.classList.add('highlighted-line');
+                }
+            }
+
+            updateInfo() {
+                const dataTypeNames = {
+                    'integer': 'Integer',
+                    'string': 'String',
+                    'produto': 'Produto'
+                };
+                
+                document.getElementById('currentDataType').textContent = dataTypeNames[this.currentDataType];
+                document.getElementById('tableSize').textContent = this.m;
+                document.getElementById('elementCount').textContent = this.n;
+                document.getElementById('loadFactor').textContent = (this.n / this.m).toFixed(2);
+                document.getElementById('resizeThreshold').textContent = 10 * this.m;
+            }
+
+            clear() {
+                this.m = 4;
+                this.n = 0;
+                this.buckets = [[], [], [], []];
+                this.updateVisualization();
+                this.updateInfo();
+                this.hideHashCalculation();
+                
+                // Remove highlights
+                document.querySelectorAll('.highlighted-line').forEach(line => {
+                    line.classList.remove('highlighted-line');
+                });
+            }
+
+            setDataType(type) {
+                this.currentDataType = type;
+                this.updateInfo();
+            }
+
+            delay(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            }
+        }
+
+        const hashTable = new HashTable();
+
+        function changeDataType() {
+            const select = document.getElementById('dataType');
+            const selectedType = select.value;
+            
+            // Esconder todos os inputs
+            document.getElementById('integerInput').style.display = 'none';
+            document.getElementById('stringInput').style.display = 'none';
+            document.getElementById('produtoInput').style.display = 'none';
+            
+            // Mostrar o input correspondente
+            document.getElementById(selectedType + 'Input').style.display = 'flex';
+            
+            hashTable.setDataType(selectedType);
+        }
+
+        async function insertValue() {
+            const input = document.getElementById('valueInput');
+            const value = parseInt(input.value);
+            
+            if (isNaN(value) || value < 1) {
+                alert('Por favor, insira um número válido (≥ 1)');
+                return;
+            }
+            
+            input.value = '';
+            await hashTable.insert(value);
+        }
+
+        async function insertStringValue() {
+            const input = document.getElementById('stringValueInput');
+            const value = input.value.trim();
+            
+            if (!value) {
+                alert('Por favor, insira uma string válida');
+                return;
+            }
+            
+            input.value = '';
+            await hashTable.insert(value);
+        }
+
+        async function insertProdutoValue() {
+            const nome = document.getElementById('produtoNome').value.trim();
+            const preco = parseFloat(document.getElementById('produtoPreco').value);
+            const quantidade = parseInt(document.getElementById('produtoQuantidade').value);
+            
+            if (!nome || isNaN(preco) || isNaN(quantidade) || preco < 0 || quantidade < 0) {
+                alert('Por favor, preencha todos os campos com valores válidos');
+                return;
+            }
+            
+            const produto = new Produto(nome, preco, quantidade);
+            
+            // Limpar inputs
+            document.getElementById('produtoNome').value = '';
+            document.getElementById('produtoPreco').value = '';
+            document.getElementById('produtoQuantidade').value = '';
+            
+            await hashTable.insert(produto);
+        }
+
+        function clearTable() {
+            hashTable.clear();
+        }
+
+        async function autoDemo() {
+            const dataType = document.getElementById('dataType').value;
+            const autoDemoBtn = document.getElementById('autoDemoBtn');
+            let demoData = [];
+            
+            // Desabilitar botão e tornar campos somente leitura
+            autoDemoBtn.disabled = true;
+            autoDemoBtn.textContent = 'Simulação em Andamento...';
+            setInputsReadOnly(true);
+            
+            switch(dataType) {
+                case 'integer':
+                    demoData = [15, 23, 8, 42, 7, 31];
+                    break;
+                case 'string':
+                    demoData = ['Ana', 'Bruno', 'Carla', 'Diego', 'Elena'];
+                    break;
+                case 'produto':
+                    demoData = [
+                        new Produto('Notebook', 2500.00, 5),
+                        new Produto('Mouse', 45.90, 20),
+                        new Produto('Teclado', 120.00, 15),
+                        new Produto('Monitor', 800.00, 8)
+                    ];
+                    break;
+            }
+            
+            for (let value of demoData) {
+                // Mostrar o valor que será inserido no campo
+                displayValueInInput(value, dataType);
+                await hashTable.insert(value);
+                await hashTable.delay(1500);
+            }
+            
+            // Reabilitar botão e campos
+            autoDemoBtn.disabled = false;
+            autoDemoBtn.textContent = 'Simulação Automática';
+            setInputsReadOnly(false);
+            clearInputs();
+        }
+        
+        function setInputsReadOnly(readonly) {
+            document.getElementById('valueInput').readOnly = readonly;
+            document.getElementById('stringValueInput').readOnly = readonly;
+            document.getElementById('produtoNome').readOnly = readonly;
+            document.getElementById('produtoPreco').readOnly = readonly;
+            document.getElementById('produtoQuantidade').readOnly = readonly;
+        }
+        
+        function displayValueInInput(value, dataType) {
+            switch(dataType) {
+                case 'integer':
+                    document.getElementById('valueInput').value = value;
+                    break;
+                case 'string':
+                    document.getElementById('stringValueInput').value = value;
+                    break;
+                case 'produto':
+                    document.getElementById('produtoNome').value = value.nome;
+                    document.getElementById('produtoPreco').value = value.preco;
+                    document.getElementById('produtoQuantidade').value = value.quantidade;
+                    break;
+            }
+        }
+        
+        function clearInputs() {
+            document.getElementById('valueInput').value = '';
+            document.getElementById('stringValueInput').value = '';
+            document.getElementById('produtoNome').value = '';
+            document.getElementById('produtoPreco').value = '';
+            document.getElementById('produtoQuantidade').value = '';
+        }
+
+        // Event listeners para navegação entre campos
+        document.getElementById('valueInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                insertValue();
+            }
+        });
+
+        document.getElementById('stringValueInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                insertStringValue();
+            }
+        });
+
+        document.getElementById('produtoNome').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                document.getElementById('produtoPreco').focus();
+            }
+        });
+
+        document.getElementById('produtoPreco').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                document.getElementById('produtoQuantidade').focus();
+            }
+        });
+
+        document.getElementById('produtoQuantidade').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                insertProdutoValue();
+            }
+        });
+
+        // Inicializar
+        hashTable.updateInfo();
+    </script>
+</body>
+</html>

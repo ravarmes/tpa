@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Algoritmo Seam Carving - Animação Interativa</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 2.5em;
+            font-weight: 300;
+        }
+
+        .header p {
+            margin: 10px 0 0 0;
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .section {
+            margin-bottom: 30px;
+        }
+
+        .section h2 {
+            color: #667eea;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        .controls {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            margin: 5px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .animation-container {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .grid-container {
+            flex: 1;
+            min-width: 300px;
+            max-width: 500px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 2px;
+            margin: 15px auto;
+            max-width: 350px;
+        }
+
+        .cell {
+            width: 50px;
+            height: 50px;
+            border: 2px solid #ddd;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: #f8f9fa;
+            position: relative;
+            transition: all 0.5s ease;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        .cell.highlighted {
+            background: #e3f2fd;
+            border-color: #2196f3;
+            transform: scale(1.05);
+        }
+
+                 .cell.seam {
+             background: #ff1744;
+             border-color: #d50000;
+             color: white;
+             animation: pulse 1s infinite;
+             box-shadow: 0 0 10px rgba(255, 23, 68, 0.5);
+         }
+
+         .cell.seam-alt {
+             background: #00c853;
+             border-color: #00a843;
+             color: white;
+             animation: pulse 1s infinite;
+             box-shadow: 0 0 10px rgba(0, 200, 83, 0.5);
+         }
+
+        .cell.calculated {
+            background: #c8e6c9;
+            border-color: #4caf50;
+        }
+
+                 .energy-value {
+             color: #d32f2f;
+             font-weight: bold;
+         }
+
+         .cumulative-value {
+             color: #1976d2;
+             font-weight: bold;
+             font-size: 14px;
+         }
+
+         .cell.seam .energy-value,
+         .cell.seam .cumulative-value {
+             color: white;
+             text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+         }
+
+         .cell.seam-alt .energy-value,
+         .cell.seam-alt .cumulative-value {
+             color: white;
+             text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+         }
+
+        .arrow {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: #4caf50;
+            clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+            transform: rotate(180deg);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .arrow.visible {
+            opacity: 1;
+        }
+
+        .explanation {
+            flex: 1;
+            min-width: 300px;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .step-indicator {
+            background: #667eea;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-bottom: 12px;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .comparison {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .comparison-item {
+            text-align: center;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border: 2px solid #e0e0e0;
+        }
+
+        .comparison-item h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+                 .image-placeholder {
+             width: 100%;
+             height: 200px;
+             border-radius: 8px;
+             margin: 10px 0;
+             display: flex;
+             align-items: center;
+             justify-content: center;
+             color: #666;
+             font-style: italic;
+             overflow: hidden;
+             position: relative;
+         }
+
+         .comparison-image {
+             width: 100%;
+             height: 100%;
+             object-fit: cover;
+             border-radius: 8px;
+         }
+
+         .image-overlay {
+             position: absolute;
+             top: 0;
+             left: 0;
+             right: 0;
+             bottom: 0;
+             background: rgba(0, 0, 0, 0.3);
+             display: flex;
+             align-items: center;
+             justify-content: center;
+             color: white;
+             font-weight: bold;
+             font-size: 16px;
+             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+         }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        .algorithm-steps {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+        }
+
+        .step {
+            margin-bottom: 8px;
+            padding: 8px;
+            border-left: 3px solid #ddd;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            line-height: 1.3;
+        }
+
+        .step.active {
+            border-left-color: #667eea;
+            background: #e3f2fd;
+        }
+
+        .step.completed {
+            border-left-color: #4caf50;
+            background: #e8f5e8;
+        }
+
+        @media (max-width: 768px) {
+            .animation-container {
+                flex-direction: column;
+            }
+            
+            .grid {
+                max-width: 100%;
+            }
+            
+            .cell {
+                width: 40px;
+                height: 40px;
+                font-size: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Algoritmo Seam Carving</h1>
+            <p>Redimensionamento de Imagens com Reconhecimento de Conteúdo</p>
+        </div>
+
+        <div class="content">
+            <div class="section">
+                <h2>O que é Seam Carving?</h2>
+                <p>
+                    O Seam Carving é um algoritmo inteligente para redimensionamento de imagens que preserva o conteúdo mais importante. 
+                    Em vez de simplesmente escalar ou cortar a imagem, ele identifica e remove "costuras" (seams) de menor importância, 
+                    mantendo os elementos principais intactos.
+                </p>
+                <p>
+                    <strong>Princípio:</strong> Encontrar o caminho de menor energia (custo) através da imagem e o remove, 
+                    reduzindo a largura ou altura sem distorcer o conteúdo principal.
+                </p>
+            </div>
+
+            <div class="section">
+                <h2>Demonstração Interativa</h2>
+                <div class="controls">
+                    <button class="btn" id="startBtn">Iniciar Animação</button>
+                    <button class="btn" id="resetBtn">Reiniciar</button>
+                    <button class="btn" id="stepBtn">Passo a Passo</button>
+                </div>
+
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+
+                <div class="animation-container">
+                    <div class="grid-container">
+                        <h3>Matriz de Energia</h3>
+                        <div class="grid" id="energyGrid">
+                            <!-- Grid será gerado dinamicamente -->
+                        </div>
+                        <div class="algorithm-steps">
+                            <div class="step" id="step1">
+                                <strong>Passo 1:</strong> Inicializar primeira linha com valores de energia
+                            </div>
+                            <div class="step" id="step2">
+                                <strong>Passo 2:</strong> Calcular energias cumulativas para cada pixel
+                            </div>
+                            <div class="step" id="step3">
+                                <strong>Passo 3:</strong> Encontrar o caminho de menor energia (seam)
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="explanation">
+                        <div class="step-indicator" id="stepIndicator">Passo 1</div>
+                        <div id="explanationText">
+                            Clique em "Iniciar Animação" para ver o algoritmo em ação!
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Comparação de Métodos de Redimensionamento</h2>
+                                 <div class="comparison">
+                     <div class="comparison-item">
+                         <h3>Escalar</h3>
+                         <div class="image-placeholder">
+                             <div style="width: 100%; height: 100%; background: linear-gradient(135deg, #667eea, #764ba2); display: flex; align-items: center; justify-content: center; position: relative;">
+                                 <div style="display: flex; align-items: center; justify-content: space-around; width: 80%; height: 60%;">
+                                     <div style="width: 60px; height: 60px; background: #fff; border: 3px solid #333; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #333; transform: scaleX(0.6);">A</div>
+                                     <div style="width: 60px; height: 60px; background: #fff; border: 3px solid #333; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #333; transform: scaleX(0.6);">B</div>
+                                     <div style="width: 60px; height: 60px; background: #fff; border: 3px solid #333; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #333; transform: scaleX(0.6);">C</div>
+                                 </div>
+                                 <div style="position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); color: white; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">Imagem Distorcida</div>
+                             </div>
+                         </div>
+                         <p><strong>Problema:</strong> Esmaga o conteúdo, distorcendo proporções</p>
+                     </div>
+                     <div class="comparison-item">
+                         <h3>Recortar</h3>
+                         <div class="image-placeholder">
+                             <div style="width: 100%; height: 100%; background: linear-gradient(135deg, #ff9800, #f57c00); display: flex; align-items: center; justify-content: center; position: relative;">
+                                 <div style="display: flex; align-items: center; justify-content: center; width: 60%; height: 60%; position: relative;">
+                                     <div style="width: 60px; height: 60px; background: #fff; border: 3px solid #333; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #333; margin-right: 20px;">B</div>
+                                     <div style="width: 60px; height: 60px; background: #fff; border: 3px solid #333; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #333;">C</div>
+                                     <div style="position: absolute; left: -30px; top: 50%; transform: translateY(-50%); width: 60px; height: 60px; background: #ccc; border: 3px dashed #999; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #999;">A</div>
+                                 </div>
+                                 <div style="position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); color: white; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">Imagem Cortada</div>
+                             </div>
+                         </div>
+                         <p><strong>Problema:</strong> Remove partes importantes da imagem</p>
+                     </div>
+                     <div class="comparison-item">
+                         <h3>Seam Carving</h3>
+                         <div class="image-placeholder">
+                             <div style="width: 100%; height: 100%; background: linear-gradient(135deg, #4caf50, #2e7d32); display: flex; align-items: center; justify-content: center; position: relative;">
+                                 <div style="display: flex; align-items: center; justify-content: space-around; width: 80%; height: 60%;">
+                                     <div style="width: 60px; height: 60px; background: #fff; border: 3px solid #333; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #333;">A</div>
+                                     <div style="width: 60px; height: 60px; background: #fff; border: 3px solid #333; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #333;">B</div>
+                                     <div style="width: 60px; height: 60px; background: #fff; border: 3px solid #333; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #333;">C</div>
+                                 </div>
+                                 <div style="position: absolute; top: 10px; left: 50%; transform: translateX(-50%); color: white; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.8); font-size: 12px;">Áreas removidas</div>
+                                 <div style="position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); color: white; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">Imagem Preservada</div>
+                             </div>
+                         </div>
+                         <p><strong>Vantagem:</strong> Preserva conteúdo importante, remove apenas áreas de baixa energia</p>
+                     </div>
+                 </div>
+            </div>
+
+            <div class="section">
+                <h2>Aplicações Práticas</h2>
+                <ul>
+                    <li><strong>Responsividade Web:</strong> Adaptar imagens para diferentes tamanhos de tela</li>
+                    <li><strong>Fotografia:</strong> Remover objetos indesejados de fotos</li>
+                    <li><strong>Design Gráfico:</strong> Redimensionar layouts mantendo elementos importantes</li>
+                    <li><strong>Processamento de Imagens:</strong> Pré-processamento para algoritmos de visão computacional</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class SeamCarvingAnimation {
+            constructor() {
+                this.grid = [];
+                this.currentStep = 0;
+                this.isAnimating = false;
+                                 this.energyValues = [
+                     [1, 4, 3, 5, 2],
+                     [3, 2, 5, 2, 3],
+                     [5, 2, 4, 2, 1]
+                 ];
+                this.cumulativeValues = [];
+                this.seamPath = [];
+                
+                this.initializeGrid();
+                this.bindEvents();
+            }
+
+            initializeGrid() {
+                const gridContainer = document.getElementById('energyGrid');
+                gridContainer.innerHTML = '';
+
+                for (let row = 0; row < 3; row++) {
+                    for (let col = 0; col < 5; col++) {
+                        const cell = document.createElement('div');
+                        cell.className = 'cell';
+                        cell.id = `cell-${row}-${col}`;
+                        
+                        const energyValue = document.createElement('div');
+                        energyValue.className = 'energy-value';
+                        energyValue.textContent = this.energyValues[row][col];
+                        
+                        const cumulativeValue = document.createElement('div');
+                        cumulativeValue.className = 'cumulative-value';
+                        cumulativeValue.textContent = '';
+                        
+                        cell.appendChild(energyValue);
+                        cell.appendChild(cumulativeValue);
+                        gridContainer.appendChild(cell);
+                    }
+                }
+            }
+
+            bindEvents() {
+                document.getElementById('startBtn').addEventListener('click', () => this.startAnimation());
+                document.getElementById('resetBtn').addEventListener('click', () => this.reset());
+                document.getElementById('stepBtn').addEventListener('click', () => this.nextStep());
+            }
+
+            async startAnimation() {
+                if (this.isAnimating) return;
+                this.isAnimating = true;
+                document.getElementById('startBtn').disabled = true;
+                
+                await this.step1();
+                await this.delay(1000);
+                await this.step2();
+                await this.delay(1000);
+                await this.step3();
+                
+                this.isAnimating = false;
+                document.getElementById('startBtn').disabled = false;
+            }
+
+            async step1() {
+                this.updateStepIndicator('Passo 1: Inicialização');
+                this.updateExplanation('Inicializando a primeira linha com os valores de energia originais. Como não há pixels acima, os valores cumulativos são iguais aos valores de energia.');
+                
+                // Mostrar primeira linha
+                for (let col = 0; col < 5; col++) {
+                    const cell = document.getElementById(`cell-0-${col}`);
+                    const cumulativeValue = cell.querySelector('.cumulative-value');
+                    
+                    await this.delay(300);
+                    cell.classList.add('highlighted');
+                    cumulativeValue.textContent = this.energyValues[0][col];
+                    cell.classList.add('calculated');
+                }
+                
+                this.updateProgress(33);
+                this.updateStepStatus(1, 'completed');
+            }
+
+            async step2() {
+                this.updateStepIndicator('Passo 2: Cálculo de Energias Cumulativas');
+                this.updateExplanation('Calculando as energias cumulativas para cada pixel. Para cada pixel, somamos sua própria energia com o mínimo das energias cumulativas dos três pixels acima.');
+                
+                // Calcular segunda linha
+                for (let col = 0; col < 5; col++) {
+                    const cell = document.getElementById(`cell-1-${col}`);
+                    const cumulativeValue = cell.querySelector('.cumulative-value');
+                    
+                    await this.delay(400);
+                    cell.classList.add('highlighted');
+                    
+                    // Calcular valor cumulativo
+                    const minAbove = this.getMinAbove(1, col);
+                    const cumulative = this.energyValues[1][col] + minAbove;
+                    cumulativeValue.textContent = cumulative;
+                    
+                    // Mostrar seta
+                    this.showArrow(1, col, minAbove);
+                    
+                    cell.classList.add('calculated');
+                    await this.delay(200);
+                    cell.classList.remove('highlighted');
+                }
+                
+                // Calcular terceira linha
+                for (let col = 0; col < 5; col++) {
+                    const cell = document.getElementById(`cell-2-${col}`);
+                    const cumulativeValue = cell.querySelector('.cumulative-value');
+                    
+                    await this.delay(400);
+                    cell.classList.add('highlighted');
+                    
+                    // Calcular valor cumulativo
+                    const minAbove = this.getMinAbove(2, col);
+                    const cumulative = this.energyValues[2][col] + minAbove;
+                    cumulativeValue.textContent = cumulative;
+                    
+                    // Mostrar seta
+                    this.showArrow(2, col, minAbove);
+                    
+                    cell.classList.add('calculated');
+                    await this.delay(200);
+                    cell.classList.remove('highlighted');
+                }
+                
+                this.updateProgress(66);
+                this.updateStepStatus(2, 'completed');
+            }
+
+                         async step3() {
+                 this.updateStepIndicator('Passo 3: Encontrar os Seams');
+                 this.updateExplanation('Encontrando os caminhos de menor energia (seams). Existem dois caminhos com energia mínima 5. Vamos mostrar ambos.');
+                 
+                 // Encontrar todos os pixels com menor energia na última linha
+                 const lastRow = 2;
+                 let minEnergy = Infinity;
+                 let minCols = [];
+                 
+                 for (let col = 0; col < 5; col++) {
+                     const cell = document.getElementById(`cell-${lastRow}-${col}`);
+                     const cumulativeValue = parseInt(cell.querySelector('.cumulative-value').textContent);
+                     if (cumulativeValue < minEnergy) {
+                         minEnergy = cumulativeValue;
+                         minCols = [col];
+                     } else if (cumulativeValue === minEnergy) {
+                         minCols.push(col);
+                     }
+                 }
+                 
+                 // Rastrear o primeiro seam
+                 await this.delay(500);
+                 this.updateExplanation('Mostrando o primeiro caminho de menor energia (seam vermelho brilhante)...');
+                 
+                 let currentRow = lastRow;
+                 let currentCol = minCols[0];
+                 
+                 while (currentRow >= 0) {
+                     const cell = document.getElementById(`cell-${currentRow}-${currentCol}`);
+                     await this.delay(300);
+                     cell.classList.add('seam');
+                     
+                     // Encontrar próximo pixel (linha acima)
+                     if (currentRow > 0) {
+                         const nextCol = this.findNextInSeam(currentRow, currentCol);
+                         currentRow--;
+                         currentCol = nextCol;
+                     } else {
+                         break;
+                     }
+                 }
+                 
+                 // Rastrear o segundo seam (se houver)
+                 if (minCols.length > 1) {
+                     await this.delay(500);
+                     this.updateExplanation('Mostrando o segundo caminho de menor energia (seam verde brilhante)...');
+                     
+                     currentRow = lastRow;
+                     currentCol = minCols[1];
+                     
+                     while (currentRow >= 0) {
+                         const cell = document.getElementById(`cell-${currentRow}-${currentCol}`);
+                         await this.delay(300);
+                         cell.classList.add('seam-alt');
+                         
+                         // Encontrar próximo pixel (linha acima)
+                         if (currentRow > 0) {
+                             const nextCol = this.findNextInSeam(currentRow, currentCol);
+                             currentRow--;
+                             currentCol = nextCol;
+                         } else {
+                             break;
+                         }
+                     }
+                 }
+                 
+                 this.updateProgress(100);
+                 this.updateStepStatus(3, 'completed');
+                 this.updateStepIndicator('Concluído!');
+                 this.updateExplanation('Dois seams (caminhos de menor energia) foram identificados! Ambos podem ser removidos da imagem sem afetar significativamente o conteúdo principal.');
+             }
+
+            getMinAbove(row, col) {
+                if (row === 0) return 0;
+                
+                const aboveRow = row - 1;
+                let minEnergy = Infinity;
+                
+                // Verificar pixels acima (diagonal esquerda, centro, diagonal direita)
+                for (let offset = -1; offset <= 1; offset++) {
+                    const checkCol = col + offset;
+                    if (checkCol >= 0 && checkCol < 5) {
+                        const cell = document.getElementById(`cell-${aboveRow}-${checkCol}`);
+                        const cumulativeValue = parseInt(cell.querySelector('.cumulative-value').textContent);
+                        if (cumulativeValue < minEnergy) {
+                            minEnergy = cumulativeValue;
+                        }
+                    }
+                }
+                
+                return minEnergy;
+            }
+
+            findNextInSeam(row, col) {
+                if (row === 0) return col;
+                
+                const aboveRow = row - 1;
+                let minEnergy = Infinity;
+                let minCol = col;
+                
+                // Verificar pixels acima
+                for (let offset = -1; offset <= 1; offset++) {
+                    const checkCol = col + offset;
+                    if (checkCol >= 0 && checkCol < 5) {
+                        const cell = document.getElementById(`cell-${aboveRow}-${checkCol}`);
+                        const cumulativeValue = parseInt(cell.querySelector('.cumulative-value').textContent);
+                        if (cumulativeValue < minEnergy) {
+                            minEnergy = cumulativeValue;
+                            minCol = checkCol;
+                        }
+                    }
+                }
+                
+                return minCol;
+            }
+
+            showArrow(row, col, minAbove) {
+                if (row === 0) return;
+                
+                const aboveRow = row - 1;
+                let arrowCol = col;
+                
+                // Encontrar de qual pixel veio o mínimo
+                for (let offset = -1; offset <= 1; offset++) {
+                    const checkCol = col + offset;
+                    if (checkCol >= 0 && checkCol < 5) {
+                        const cell = document.getElementById(`cell-${aboveRow}-${checkCol}`);
+                        const cumulativeValue = parseInt(cell.querySelector('.cumulative-value').textContent);
+                        if (cumulativeValue === minAbove) {
+                            arrowCol = checkCol;
+                            break;
+                        }
+                    }
+                }
+                
+                // Criar seta
+                const arrow = document.createElement('div');
+                arrow.className = 'arrow';
+                arrow.style.left = '50%';
+                arrow.style.top = '-10px';
+                arrow.style.transform = 'translateX(-50%) rotate(180deg)';
+                
+                const cell = document.getElementById(`cell-${row}-${col}`);
+                cell.appendChild(arrow);
+                
+                setTimeout(() => arrow.classList.add('visible'), 100);
+            }
+
+            updateStepIndicator(text) {
+                document.getElementById('stepIndicator').textContent = text;
+            }
+
+            updateExplanation(text) {
+                document.getElementById('explanationText').textContent = text;
+            }
+
+            updateProgress(percentage) {
+                document.getElementById('progressFill').style.width = percentage + '%';
+            }
+
+            updateStepStatus(stepNumber, status) {
+                const step = document.getElementById(`step${stepNumber}`);
+                step.className = `step ${status}`;
+            }
+
+            async nextStep() {
+                if (this.currentStep === 0) {
+                    await this.step1();
+                    this.currentStep = 1;
+                } else if (this.currentStep === 1) {
+                    await this.step2();
+                    this.currentStep = 2;
+                } else if (this.currentStep === 2) {
+                    await this.step3();
+                    this.currentStep = 3;
+                }
+            }
+
+            reset() {
+                this.currentStep = 0;
+                this.isAnimating = false;
+                
+                // Limpar grid
+                for (let row = 0; row < 3; row++) {
+                    for (let col = 0; col < 5; col++) {
+                        const cell = document.getElementById(`cell-${row}-${col}`);
+                        cell.className = 'cell';
+                        const cumulativeValue = cell.querySelector('.cumulative-value');
+                        cumulativeValue.textContent = '';
+                        
+                        // Remover setas
+                        const arrows = cell.querySelectorAll('.arrow');
+                        arrows.forEach(arrow => arrow.remove());
+                    }
+                }
+                
+                // Resetar controles
+                document.getElementById('startBtn').disabled = false;
+                document.getElementById('stepIndicator').textContent = 'Passo 1';
+                document.getElementById('explanationText').textContent = 'Clique em "Iniciar Animação" para ver o algoritmo em ação!';
+                document.getElementById('progressFill').style.width = '0%';
+                
+                // Resetar passos
+                for (let i = 1; i <= 3; i++) {
+                    const step = document.getElementById(`step${i}`);
+                    step.className = 'step';
+                }
+            }
+
+            delay(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            }
+        }
+
+        // Inicializar animação quando a página carregar
+        document.addEventListener('DOMContentLoaded', () => {
+            new SeamCarvingAnimation();
+        });
+    </script>
+</body>
+</html> 

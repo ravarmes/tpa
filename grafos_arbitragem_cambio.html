@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arbitragem de Câmbio - Algoritmo de Bellman-Ford</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+
+        .controls {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        button {
+            background: linear-gradient(45deg, #3498db, #2980b9);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            margin: 0 10px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+        }
+
+        button:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .main-content {
+            display: flex;
+            gap: 30px;
+            align-items: flex-start;
+        }
+
+        .graph-container {
+            flex: 2;
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            position: relative;
+            min-height: 700px;
+            width: 100%;
+        }
+
+        .info-panel {
+            flex: 1;
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+        }
+
+        .currency-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            font-size: 12px;
+        }
+
+        .currency-table th,
+        .currency-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+
+        .currency-table th {
+            background: #3498db;
+            color: white;
+        }
+
+        .node {
+            position: absolute;
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #e74c3c, #c0392b);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            z-index: 10;
+        }
+
+        .node:hover {
+            transform: scale(1.1);
+        }
+
+        .node.highlighted {
+            background: linear-gradient(45deg, #f39c12, #e67e22);
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .edge {
+            position: absolute;
+            background: #34495e;
+            height: 2px;
+            transform-origin: left center;
+            transition: all 0.3s ease;
+            z-index: 1;
+        }
+
+        .edge::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: -3px;
+            width: 0;
+            height: 0;
+            border-left: 8px solid #34495e;
+            border-top: 4px solid transparent;
+            border-bottom: 4px solid transparent;
+        }
+
+        .edge.highlighted {
+            background: #e74c3c;
+            height: 4px;
+            animation: glow 1s infinite;
+        }
+
+        .edge.highlighted::after {
+            border-left: 8px solid #e74c3c;
+            top: -4px;
+        }
+
+        @keyframes glow {
+            0% { box-shadow: 0 0 5px #e74c3c; }
+            50% { box-shadow: 0 0 20px #e74c3c; }
+            100% { box-shadow: 0 0 5px #e74c3c; }
+        }
+
+        .edge-label {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 2px 5px;
+            border-radius: 2px;
+            font-size: 11px;
+            border: none;
+            font-weight: bold;
+            z-index: 5;
+            color: #2c3e50;
+            white-space: nowrap;
+        }
+
+        .edge-label.arbitrage-cycle {
+            background: rgba(255, 243, 205, 0.9);
+            color: #856404;
+            font-weight: bold;
+            font-size: 12px;
+            padding: 2px 5px;
+        }
+
+        .step-info {
+            background: #ecf0f1;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border-left: 4px solid #3498db;
+        }
+
+        .calculation {
+            background: #d5f4e6;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+        }
+
+        .profit {
+            background: #d4edda;
+            color: #155724;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .loss {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .algorithm-step {
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border-left: 4px solid #ffc107;
+        }
+
+        .formula {
+            background: #e9ecef;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            text-align: center;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔄 Arbitragem de Câmbio - Algoritmo de Bellman-Ford</h1>
+        
+        <div class="controls">
+            <button onclick="startAnimation()">Iniciar Animação</button>
+            <button onclick="nextStep()" id="nextBtn" disabled>Próximo Passo</button>
+            <button onclick="resetAnimation()">Reiniciar</button>
+        </div>
+
+        <div class="main-content">
+            <div class="graph-container" id="graphContainer">
+                <h3>Grafo de Moedas</h3>
+                <!-- Nós serão criados dinamicamente -->
+            </div>
+
+            <div class="info-panel">
+                <h3>Tabela de Taxas de Câmbio</h3>
+                <table class="currency-table">
+                    <tr>
+                        <th></th>
+                        <th>USD</th>
+                        <th>EUR</th>
+                        <th>GBP</th>
+                        <th>CHF</th>
+                        <th>CAD</th>
+                    </tr>
+                    <tr>
+                        <th>USD</th>
+                        <td>1</td>
+                        <td>0.741</td>
+                        <td>0.657</td>
+                        <td>1.061</td>
+                        <td>1.011</td>
+                    </tr>
+                    <tr>
+                        <th>EUR</th>
+                        <td>1.350</td>
+                        <td>1</td>
+                        <td>0.888</td>
+                        <td>1.433</td>
+                        <td>1.366</td>
+                    </tr>
+                    <tr>
+                        <th>GBP</th>
+                        <td>1.521</td>
+                        <td>1.126</td>
+                        <td>1</td>
+                        <td>1.614</td>
+                        <td>1.538</td>
+                    </tr>
+                    <tr>
+                        <th>CHF</th>
+                        <td>0.943</td>
+                        <td>0.698</td>
+                        <td>0.620</td>
+                        <td>1</td>
+                        <td>0.953</td>
+                    </tr>
+                    <tr>
+                        <th>CAD</th>
+                        <td>0.995</td>
+                        <td>0.732</td>
+                        <td>0.650</td>
+                        <td>1.049</td>
+                        <td>1</td>
+                    </tr>
+                </table>
+
+                <div id="stepInfo">
+                    <div class="step-info">
+                        <h4>Como funciona?</h4>
+                        <p>Uma <strong>arbitragem</strong> é um ciclo onde o produto das taxas de câmbio é maior que 1.</p>
+                        <p>Usamos o algoritmo de Bellman-Ford para detectar ciclos negativos após transformação logarítmica.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const exchangeRates = {
+            'USD': { 'EUR': 0.741, 'GBP': 0.657, 'CHF': 1.061, 'CAD': 1.011 },
+            'EUR': { 'USD': 1.350, 'GBP': 0.888, 'CHF': 1.433, 'CAD': 1.366 },
+            'GBP': { 'USD': 1.521, 'EUR': 1.126, 'CHF': 1.614, 'CAD': 1.538 },
+            'CHF': { 'USD': 0.943, 'EUR': 0.698, 'GBP': 0.620, 'CAD': 0.953 },
+            'CAD': { 'USD': 0.995, 'EUR': 0.732, 'GBP': 0.650, 'CHF': 1.049 }
+        };
+
+        const nodePositions = {
+            'EUR': { x: 400, y: 100 },     // Topo central
+            'GBP': { x: 600, y: 250 },     // Direita superior  
+            'CHF': { x: 550, y: 450 },     // Direita inferior
+            'CAD': { x: 250, y: 450 },     // Esquerda inferior
+            'USD': { x: 200, y: 250 }      // Esquerda superior
+        };
+
+        let currentStep = 0;
+        let animationRunning = false;
+        const arbitragePath = ['USD', 'EUR', 'CAD', 'USD'];
+
+        function createGraph() {
+            const container = document.getElementById('graphContainer');
+            
+            // Limpar grafo existente
+            const existingNodes = container.querySelectorAll('.node, .edge, .edge-label');
+            existingNodes.forEach(el => el.remove());
+
+            // Criar nós
+            Object.keys(nodePositions).forEach(currency => {
+                const node = document.createElement('div');
+                node.className = 'node';
+                node.id = `node-${currency}`;
+                node.textContent = currency;
+                node.style.left = `${nodePositions[currency].x}px`;
+                node.style.top = `${nodePositions[currency].y}px`;
+                container.appendChild(node);
+            });
+
+            // Criar TODAS as arestas bidirecionais (grafo direcionado completo)
+            Object.keys(exchangeRates).forEach(from => {
+                Object.keys(exchangeRates[from]).forEach(to => {
+                    createEdge(from, to, exchangeRates[from][to]);
+                });
+            });
+        }
+
+        function createEdge(from, to, rate) {
+            const container = document.getElementById('graphContainer');
+            const fromPos = nodePositions[from];
+            const toPos = nodePositions[to];
+            
+            const dx = toPos.x - fromPos.x;
+            const dy = toPos.y - fromPos.y;
+            const length = Math.sqrt(dx * dx + dy * dy);
+            const angle = Math.atan2(dy, dx) * 180 / Math.PI;
+
+            // Criar offset para arestas bidirecionais não se sobreporem
+            const offsetDistance = 18; // Distância do offset
+            const perpAngle = (angle + 90) * Math.PI / 180; // Ângulo perpendicular
+            
+            // Determinar se esta é a primeira ou segunda aresta entre os mesmos nós
+            const reverseExists = document.getElementById(`edge-${to}-${from}`);
+            const isSecondEdge = reverseExists !== null;
+            
+            let offsetX = 0;
+            let offsetY = 0;
+            
+            if (isSecondEdge) {
+                // Aplicar offset perpendicular para separar as arestas
+                offsetX = Math.cos(perpAngle) * offsetDistance;
+                offsetY = Math.sin(perpAngle) * offsetDistance;
+            }
+
+            const edge = document.createElement('div');
+            edge.className = 'edge';
+            edge.id = `edge-${from}-${to}`;
+            edge.style.left = `${fromPos.x + 35 + offsetX}px`;
+            edge.style.top = `${fromPos.y + 35 + offsetY}px`;
+            edge.style.width = `${length - 70}px`;
+            edge.style.transform = `rotate(${angle}deg)`;
+            container.appendChild(edge);
+
+            // Label da aresta - com posicionamento único para evitar sobreposição
+            const label = document.createElement('div');
+            let className = 'edge-label';
+            
+            // Destacar labels do ciclo de arbitragem
+            if ((from === 'USD' && to === 'EUR') || 
+                (from === 'EUR' && to === 'CAD') || 
+                (from === 'CAD' && to === 'USD')) {
+                className += ' arbitrage-cycle';
+            }
+            
+            label.className = className;
+            label.id = `label-${from}-${to}`;
+            label.textContent = rate.toFixed(3);
+            label.title = `${from} → ${to}: ${rate.toFixed(3)}`; // Tooltip para debug
+            
+            // Posicionar o label acompanhando o offset da aresta
+            const labelOffsetX = isSecondEdge ? offsetX : 0;
+            const labelOffsetY = isSecondEdge ? offsetY : 0;
+            
+            // Posicionar label mais próximo do vértice de origem
+            label.style.left = `${fromPos.x + dx/5 + 40 + labelOffsetX}px`;
+            label.style.top = `${fromPos.y + dy/5 + 25 + labelOffsetY}px`;
+            container.appendChild(label);
+        }
+
+        function clearAllHighlights() {
+            document.querySelectorAll('.node').forEach(node => {
+                node.classList.remove('highlighted');
+            });
+            document.querySelectorAll('.edge').forEach(edge => {
+                edge.classList.remove('highlighted');
+            });
+        }
+
+        function highlightNodes(nodeList) {
+            clearAllHighlights();
+            nodeList.forEach(nodeName => {
+                const nodeId = `node-${nodeName}`;
+                const node = document.getElementById(nodeId);
+                if (node) {
+                    node.classList.add('highlighted');
+                    console.log(`Highlighted node: ${nodeName}`);
+                } else {
+                    console.warn(`Node not found: ${nodeId}`);
+                }
+            });
+        }
+
+        function highlightEdges(edgeList) {
+            edgeList.forEach(edge => {
+                const [from, to] = edge;
+                const edgeId = `edge-${from}-${to}`;
+                const edgeElement = document.getElementById(edgeId);
+                if (edgeElement) {
+                    edgeElement.classList.add('highlighted');
+                    console.log(`Highlighted edge: ${from} -> ${to}`);
+                } else {
+                    console.warn(`Edge not found: ${edgeId}`);
+                }
+            });
+        }
+
+        // Manter função antiga para compatibilidade
+        function highlightPath(path, stepIndex) {
+            clearAllHighlights();
+            if (stepIndex < 0) return;
+        }
+
+        function updateStepInfo(step) {
+            const stepInfo = document.getElementById('stepInfo');
+            
+            switch(step) {
+                case 0:
+                    stepInfo.innerHTML = `
+                        <div class="step-info">
+                            <h4>Passo 1: Identificando a Oportunidade</h4>
+                            <p>Vamos analisar o ciclo: <strong>USD → EUR → CAD → USD</strong></p>
+                            <p>Verificaremos se o produto das taxas de câmbio é maior que 1.</p>
+                        </div>
+                    `;
+                    break;
+
+                case 1:
+                    stepInfo.innerHTML = `
+                        <div class="step-info">
+                            <h4>Passo 2: USD → EUR</h4>
+                            <p>Começamos com <strong>$10.000 USD</strong></p>
+                            <p>Taxa de conversão: <strong>0.741</strong></p>
+                        </div>
+                        <div class="calculation">
+                            $10.000 × 0.741 = €7.410
+                        </div>
+                    `;
+                    break;
+
+                case 2:
+                    stepInfo.innerHTML = `
+                        <div class="step-info">
+                            <h4>Passo 3: EUR → CAD</h4>
+                            <p>Temos <strong>€7.410</strong></p>
+                            <p>Taxa de conversão: <strong>1.366</strong></p>
+                        </div>
+                        <div class="calculation">
+                            €7.410 × 1.366 = CAD $10.122
+                        </div>
+                    `;
+                    break;
+
+                case 3:
+                    stepInfo.innerHTML = `
+                        <div class="step-info">
+                            <h4>Passo 4: CAD → USD</h4>
+                            <p>Temos <strong>CAD $10.122</strong></p>
+                            <p>Taxa de conversão: <strong>0.995</strong></p>
+                        </div>
+                        <div class="calculation">
+                            CAD $10.122 × 0.995 = $10.071
+                        </div>
+                        <div class="profit">
+                            🎉 LUCRO: $10.071 - $10.000 = $71
+                        </div>
+                    `;
+                    break;
+
+                case 4:
+                    stepInfo.innerHTML = `
+                        <div class="algorithm-step">
+                            <h4>Algoritmo de Bellman-Ford</h4>
+                            <p><strong>Transformação Matemática:</strong></p>
+                            <div class="formula">
+                                0.741 × 1.366 × 0.995 = 1.00714 > 1
+                            </div>
+                            <p>Como o produto > 1, temos arbitragem!</p>
+                        </div>
+                    `;
+                    break;
+
+                case 5:
+                    stepInfo.innerHTML = `
+                        <div class="algorithm-step">
+                            <h4>Aplicando Logaritmos</h4>
+                            <p>Para usar Bellman-Ford, convertemos multiplicação em soma:</p>
+                            <div class="formula">
+                                log(0.741) + log(1.366) + log(0.995) =<br>
+                                -0.2998 + 0.3119 + (-0.005) = 0.0071 > 0
+                            </div>
+                            <p>Soma positiva = Arbitragem detectada!</p>
+                        </div>
+                    `;
+                    break;
+
+                case 6:
+                    stepInfo.innerHTML = `
+                        <div class="algorithm-step">
+                            <h4>Bellman-Ford para Ciclos Negativos</h4>
+                            <p>Negamos os logaritmos para detectar ciclos negativos:</p>
+                            <div class="formula">
+                                -log(0.741) - log(1.366) - log(0.995) =<br>
+                                0.2998 - 0.3119 + 0.005 = -0.0071 < 0
+                            </div>
+                            <p>Ciclo negativo detectado = Arbitragem confirmada!</p>
+                        </div>
+                    `;
+                    break;
+            }
+        }
+
+        function startAnimation() {
+            console.log('Starting animation...');
+            animationRunning = true;
+            currentStep = 0;
+            document.getElementById('nextBtn').disabled = false;
+            createGraph();
+            updateStepInfo(0);
+            clearAllHighlights();
+            console.log('Animation started successfully');
+        }
+
+        function nextStep() {
+            console.log(`Current step before increment: ${currentStep}`);
+            
+            if (currentStep < 6) {
+                currentStep++;
+                console.log(`New step: ${currentStep}`);
+                
+                updateStepInfo(currentStep);
+                
+                // Mostrar o progresso visual conforme os passos
+                try {
+                    if (currentStep === 1) {
+                        // USD → EUR
+                        highlightNodes(['USD', 'EUR']);
+                        highlightEdges([['USD', 'EUR']]);
+                    } else if (currentStep === 2) {
+                        // USD → EUR → CAD
+                        highlightNodes(['USD', 'EUR', 'CAD']);
+                        highlightEdges([['USD', 'EUR'], ['EUR', 'CAD']]);
+                    } else if (currentStep === 3) {
+                        // USD → EUR → CAD → USD (ciclo completo)
+                        highlightNodes(['USD', 'EUR', 'CAD']);
+                        highlightEdges([['USD', 'EUR'], ['EUR', 'CAD'], ['CAD', 'USD']]);
+                    } else {
+                        // Para os passos finais do algoritmo, manter o ciclo destacado
+                        highlightNodes(['USD', 'EUR', 'CAD']);
+                        highlightEdges([['USD', 'EUR'], ['EUR', 'CAD'], ['CAD', 'USD']]);
+                    }
+                } catch (error) {
+                    console.error('Error in highlighting:', error);
+                }
+                
+                if (currentStep >= 6) {
+                    document.getElementById('nextBtn').disabled = true;
+                }
+            }
+        }
+
+        function resetAnimation() {
+            console.log('Resetting animation...');
+            animationRunning = false;
+            currentStep = 0;
+            document.getElementById('nextBtn').disabled = true;
+            createGraph();
+            clearAllHighlights();
+            
+            document.getElementById('stepInfo').innerHTML = `
+                <div class="step-info">
+                    <h4>Como funciona?</h4>
+                    <p>Uma <strong>arbitragem</strong> é um ciclo onde o produto das taxas de câmbio é maior que 1.</p>
+                    <p>Usamos o algoritmo de Bellman-Ford para detectar ciclos negativos após transformação logarítmica.</p>
+                </div>
+            `;
+        }
+
+        // Inicializar o grafo
+        document.addEventListener('DOMContentLoaded', function() {
+            createGraph();
+        });
+    </script>
+</body>
+</html>

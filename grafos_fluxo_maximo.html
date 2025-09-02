@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fluxo Máximo - Sistema de Distribuição de Água</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .subtitle {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .controls {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        button {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            margin: 0 10px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        button:disabled {
+            background: #666;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .main-content {
+            display: flex;
+            gap: 30px;
+            align-items: flex-start;
+            margin-bottom: 30px;
+        }
+        
+        .canvas-container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+        }
+        
+        canvas {
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+        
+        .info-panel {
+            width: 350px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .info-box {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 15px;
+            backdrop-filter: blur(5px);
+        }
+        
+        .info-box h3 {
+            margin-top: 0;
+            color: #FFD700;
+            font-size: 1.3em;
+        }
+        
+        .status {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            text-align: center;
+        }
+        
+        .legend {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-top: 20px;
+            margin-bottom: 40px;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 8px 15px;
+            border-radius: 20px;
+        }
+        
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+        }
+        
+        .water-flow {
+            animation: flow 2s ease-in-out infinite;
+        }
+        
+        @keyframes flow {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+        
+        .pulse {
+            animation: pulse 1s ease-in-out;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚰 Sistema de Distribuição de Água</h1>
+        <p class="subtitle">Algoritmo de Fluxo Máximo (Ford-Fulkerson)</p>
+        
+        <div class="controls">
+            <button onclick="startAnimation()">🎬 Iniciar Animação</button>
+            <button onclick="stepAnimation()">⏭️ Próximo Passo</button>
+            <button onclick="resetAnimation()">🔄 Reiniciar</button>
+        </div>
+        
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color" style="background: #4CAF50;"></div>
+                <span>Estação de Tratamento (Fonte)</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #2196F3;"></div>
+                <span>Reservatório (Destino)</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #FF9800;"></div>
+                <span>Estações Intermediárias</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #FF5722;"></div>
+                <span>Caminho Atual</span>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <div class="canvas-container">
+                <canvas id="networkCanvas" width="800" height="400"></canvas>
+            </div>
+            
+            <div class="info-panel">
+            <div class="info-box">
+                <h3>📊 Status Atual</h3>
+                <div id="status" class="status">Pronto para começar</div>
+                <div id="currentPath">Caminho atual: Nenhum</div>
+                <div id="pathFlow">Fluxo do caminho: 0</div>
+                <div id="totalFlow">Fluxo total: 0</div>
+            </div>
+            
+            <div class="info-box">
+                <h3>💡 Explicação</h3>
+                <div id="explanation">
+                    O algoritmo Ford-Fulkerson encontra o fluxo máximo de água que pode ser transportado 
+                    da Estação de Tratamento até o Reservatório através da rede de canos.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('networkCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Grafo baseado na imagem fornecida (adaptado para sistema de água)
+        const graph = {
+            nodes: [
+                {id: 0, x: 100, y: 200, label: 'Estação\nTratamento', type: 'source'},
+                {id: 1, x: 400, y: 100, label: 'Bomba 1', type: 'intermediate'},
+                {id: 2, x: 250, y: 100, label: 'Válvula 2', type: 'intermediate'},
+                {id: 3, x: 250, y: 300, label: 'Válvula 3', type: 'intermediate'},
+                {id: 4, x: 400, y: 200, label: 'Junção 4', type: 'intermediate'},
+                {id: 5, x: 550, y: 300, label: 'Bomba 5', type: 'intermediate'},
+                {id: 6, x: 700, y: 200, label: 'Reservatório', type: 'sink'}
+            ],
+            edges: [
+                {from: 0, to: 2, capacity: 2, flow: 0, label: 'Cano A'},
+                {from: 0, to: 4, capacity: 1, flow: 0, label: 'Cano B'},
+                {from: 0, to: 3, capacity: 4, flow: 0, label: 'Cano C'},
+                {from: 2, to: 1, capacity: 2, flow: 0, label: 'Cano D'},
+                {from: 2, to: 4, capacity: 2, flow: 0, label: 'Cano E'},
+                {from: 3, to: 4, capacity: 4, flow: 0, label: 'Cano F'},
+                {from: 3, to: 5, capacity: 1, flow: 0, label: 'Cano G'},
+                {from: 1, to: 6, capacity: 3, flow: 0, label: 'Cano H'},
+                {from: 4, to: 1, capacity: 3, flow: 0, label: 'Cano I'},
+                {from: 4, to: 5, capacity: 3, flow: 0, label: 'Cano J'},
+                {from: 5, to: 6, capacity: 2, flow: 0, label: 'Cano K'}
+            ]
+        };
+        
+        let animationState = 'stopped';
+        let currentStep = 0;
+        let totalMaxFlow = 0;
+        let foundPaths = [];
+        let currentPath = [];
+        let currentPathFlow = 0;
+        
+        const steps = [
+            {
+                path: [0, 2, 1, 6],
+                flow: 2,
+                explanation: "Primeiro caminho encontrado: Estação → Válvula 2 → Bomba 1 → Reservatório com fluxo 2"
+            },
+            {
+                path: [0, 4, 1, 6],
+                flow: 1,
+                explanation: "Segundo caminho: Estação → Junção 4 → Bomba 1 → Reservatório com fluxo 1"
+            },
+            {
+                path: [0, 3, 5, 6],
+                flow: 1,
+                explanation: "Terceiro caminho: Estação → Válvula 3 → Bomba 5 → Reservatório com fluxo 1"
+            },
+            {
+                path: [0, 3, 4, 5, 6],
+                flow: 2,
+                explanation: "Quarto caminho: Estação → Válvula 3 → Junção 4 → Bomba 5 → Reservatório com fluxo 2"
+            }
+        ];
+        
+        function drawNetwork() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Desenhar arestas
+            graph.edges.forEach(edge => {
+                const fromNode = graph.nodes.find(n => n.id === edge.from);
+                const toNode = graph.nodes.find(n => n.id === edge.to);
+                
+                const isInCurrentPath = currentPath.length > 0 && 
+                    currentPath.some((nodeId, index) => 
+                        index < currentPath.length - 1 && 
+                        currentPath[index] === edge.from && 
+                        currentPath[index + 1] === edge.to
+                    );
+                
+                // Cor da aresta
+                ctx.strokeStyle = isInCurrentPath ? '#FF5722' : (edge.flow > 0 ? '#2196F3' : '#666');
+                ctx.lineWidth = isInCurrentPath ? 4 : (edge.flow > 0 ? 3 : 2);
+                
+                // Desenhar linha
+                ctx.beginPath();
+                ctx.moveTo(fromNode.x, fromNode.y);
+                ctx.lineTo(toNode.x, toNode.y);
+                ctx.stroke();
+                
+                // Desenhar seta
+                drawArrow(fromNode.x, fromNode.y, toNode.x, toNode.y);
+                
+                // Desenhar capacidade/fluxo
+                const midX = (fromNode.x + toNode.x) / 2;
+                const midY = (fromNode.y + toNode.y) / 2;
+                
+                ctx.fillStyle = '#000';
+                ctx.font = 'bold 12px Arial';
+                ctx.textAlign = 'center';
+                
+                const flowText = `${edge.flow}/${edge.capacity}`;
+                ctx.fillRect(midX - 15, midY - 10, 30, 20);
+                ctx.fillStyle = 'white';
+                ctx.fillText(flowText, midX, midY + 4);
+                
+                // Animação de fluxo de água
+                if (edge.flow > 0) {
+                    drawWaterFlow(fromNode.x, fromNode.y, toNode.x, toNode.y);
+                }
+            });
+            
+            // Desenhar nós
+            graph.nodes.forEach(node => {
+                const isInCurrentPath = currentPath.includes(node.id);
+                
+                // Cor do nó baseada no tipo
+                let fillColor;
+                switch(node.type) {
+                    case 'source': fillColor = '#4CAF50'; break;
+                    case 'sink': fillColor = '#2196F3'; break;
+                    default: fillColor = '#FF9800';
+                }
+                
+                if (isInCurrentPath) {
+                    fillColor = '#FF5722';
+                    ctx.shadowColor = '#FF5722';
+                    ctx.shadowBlur = 10;
+                }
+                
+                // Desenhar círculo do nó
+                ctx.beginPath();
+                ctx.arc(node.x, node.y, 30, 0, 2 * Math.PI);
+                ctx.fillStyle = fillColor;
+                ctx.fill();
+                ctx.strokeStyle = '#333';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+                
+                ctx.shadowBlur = 0;
+                
+                // Desenhar label
+                ctx.fillStyle = 'white';
+                ctx.font = 'bold 10px Arial';
+                ctx.textAlign = 'center';
+                const lines = node.label.split('\n');
+                lines.forEach((line, index) => {
+                    ctx.fillText(line, node.x, node.y - 5 + index * 12);
+                });
+                
+                // Desenhar ID
+                ctx.fillStyle = '#333';
+                ctx.font = 'bold 14px Arial';
+                ctx.fillText(node.id.toString(), node.x, node.y + 15);
+            });
+        }
+        
+        function drawArrow(fromX, fromY, toX, toY) {
+            const angle = Math.atan2(toY - fromY, toX - fromX);
+            const arrowLength = 10;
+            const arrowAngle = Math.PI / 6;
+            
+            // Ajustar posição da seta para não sobrepor o nó
+            const distance = Math.sqrt((toX - fromX) ** 2 + (toY - fromY) ** 2);
+            const adjustedDistance = distance - 30;
+            const adjustedToX = fromX + (adjustedDistance * Math.cos(angle));
+            const adjustedToY = fromY + (adjustedDistance * Math.sin(angle));
+            
+            ctx.beginPath();
+            ctx.moveTo(adjustedToX, adjustedToY);
+            ctx.lineTo(
+                adjustedToX - arrowLength * Math.cos(angle - arrowAngle),
+                adjustedToY - arrowLength * Math.sin(angle - arrowAngle)
+            );
+            ctx.moveTo(adjustedToX, adjustedToY);
+            ctx.lineTo(
+                adjustedToX - arrowLength * Math.cos(angle + arrowAngle),
+                adjustedToY - arrowLength * Math.sin(angle + arrowAngle)
+            );
+            ctx.stroke();
+        }
+        
+        function drawWaterFlow(fromX, fromY, toX, toY) {
+            const numDrops = 3;
+            const time = Date.now() / 1000;
+            
+            for (let i = 0; i < numDrops; i++) {
+                const progress = (time * 0.5 + i / numDrops) % 1;
+                const x = fromX + (toX - fromX) * progress;
+                const y = fromY + (toY - fromY) * progress;
+                
+                ctx.beginPath();
+                ctx.arc(x, y, 3, 0, 2 * Math.PI);
+                ctx.fillStyle = `rgba(30, 144, 255, ${0.8 - progress * 0.5})`;
+                ctx.fill();
+            }
+        }
+        
+        function updateFlows(path, flow) {
+            for (let i = 0; i < path.length - 1; i++) {
+                const edge = graph.edges.find(e => 
+                    e.from === path[i] && e.to === path[i + 1]
+                );
+                if (edge) {
+                    edge.flow += flow;
+                }
+            }
+        }
+        
+        function startAnimation() {
+            resetAnimation();
+            animationState = 'running';
+            currentStep = 0;
+            nextStep();
+        }
+        
+        function stepAnimation() {
+            if (currentStep < steps.length) {
+                nextStep();
+            }
+        }
+        
+        function nextStep() {
+            if (currentStep >= steps.length) {
+                document.getElementById('status').textContent = `Concluído! Fluxo máximo encontrado: ${totalMaxFlow}`;
+                document.getElementById('explanation').textContent = 
+                    `O algoritmo Ford-Fulkerson encontrou o fluxo máximo de ${totalMaxFlow} unidades de água por segundo. ` +
+                    `Isso significa que a rede pode transportar no máximo ${totalMaxFlow} metros cúbicos por segundo ` +
+                    `da estação de tratamento até o reservatório.`;
+                currentPath = [];
+                animationState = 'completed';
+                return;
+            }
+            
+            const step = steps[currentStep];
+            currentPath = step.path;
+            currentPathFlow = step.flow;
+            totalMaxFlow += step.flow;
+            
+            // Atualizar fluxos no grafo
+            updateFlows(step.path, step.flow);
+            
+            // Atualizar interface
+            document.getElementById('status').textContent = `Passo ${currentStep + 1} de ${steps.length}`;
+            document.getElementById('currentPath').textContent = 
+                `Caminho: ${step.path.map(id => graph.nodes[id].label.split('\n')[0]).join(' → ')}`;
+            document.getElementById('pathFlow').textContent = `Fluxo do caminho: ${step.flow}`;
+            document.getElementById('totalFlow').textContent = `Fluxo total acumulado: ${totalMaxFlow}`;
+            document.getElementById('explanation').textContent = step.explanation;
+            
+            currentStep++;
+            
+            if (animationState === 'running') {
+                setTimeout(() => {
+                    if (currentStep < steps.length) {
+                        setTimeout(nextStep, 2000);
+                    } else {
+                        setTimeout(() => {
+                            document.getElementById('status').textContent = `Concluído! Fluxo máximo: ${totalMaxFlow}`;
+                            document.getElementById('explanation').textContent = 
+                                `Algoritmo concluído! O fluxo máximo de água que pode ser transportado é de ${totalMaxFlow} unidades por segundo.`;
+                            currentPath = [];
+                            animationState = 'completed';
+                        }, 2000);
+                    }
+                }, 1000);
+            }
+        }
+        
+        function resetAnimation() {
+            animationState = 'stopped';
+            currentStep = 0;
+            totalMaxFlow = 0;
+            currentPath = [];
+            currentPathFlow = 0;
+            
+            // Resetar fluxos
+            graph.edges.forEach(edge => edge.flow = 0);
+            
+            // Resetar interface
+            document.getElementById('status').textContent = 'Pronto para começar';
+            document.getElementById('currentPath').textContent = 'Caminho atual: Nenhum';
+            document.getElementById('pathFlow').textContent = 'Fluxo do caminho: 0';
+            document.getElementById('totalFlow').textContent = 'Fluxo total: 0';
+            document.getElementById('explanation').textContent = 
+                'O algoritmo Ford-Fulkerson encontra o fluxo máximo de água que pode ser transportado ' +
+                'da Estação de Tratamento até o Reservatório através da rede de canos.';
+        }
+        
+        // Loop de animação
+        function animate() {
+            drawNetwork();
+            requestAnimationFrame(animate);
+        }
+        
+        // Inicializar
+        resetAnimation();
+        animate();
+    </script>
+</body>
+</html>

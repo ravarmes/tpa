@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Problema do Caixeiro Viajante</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 25px;
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        button:disabled {
+            background: #666;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .main-content {
+            display: flex;
+            gap: 30px;
+            align-items: flex-start;
+        }
+        
+        .canvas-container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+        }
+        
+        canvas {
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .info-panel {
+            width: 600px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .info-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .info-card h3 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            color: #ffd700;
+            font-size: 1.1rem;
+        }
+        
+        .status {
+            text-align: center;
+            font-size: 1.1rem;
+            margin: 0 0 15px 0;
+            font-weight: bold;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .algorithm-selector {
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        select {
+            padding: 10px 20px;
+            border-radius: 20px;
+            border: none;
+            background: rgba(255, 255, 255, 0.9);
+            font-size: 16px;
+            margin: 0 10px;
+        }
+        
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚛 Problema do Caixeiro Viajante</h1>
+        
+        <div class="algorithm-selector">
+            <label for="algorithm">Algoritmo:</label>
+            <select id="algorithm">
+                <option value="bruteForce">Força Bruta</option>
+                <option value="nearestNeighbor">Vizinho Mais Próximo</option>
+                <option value="genetic">Algoritmo Genético</option>
+            </select>
+        </div>
+        
+        <div class="controls">
+            <button onclick="generateCities()">🏙️ Gerar Cidades</button>
+            <button onclick="startAnimation()">▶️ Iniciar Animação</button>
+            <button onclick="pauseAnimation()">⏸️ Pausar</button>
+            <button onclick="resetAnimation()">🔄 Resetar</button>
+            <button onclick="showOptimalPath()">⭐ Mostrar Melhor Caminho</button>
+        </div>
+        
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color" style="background: #3498db;"></div>
+                <span>Cidades</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #e74c3c;"></div>
+                <span>Caminho Atual</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #27ae60;"></div>
+                <span>Melhor Caminho</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #f39c12;"></div>
+                <span>Cidade Atual</span>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <div class="canvas-container">
+                <canvas id="tspCanvas" width="600" height="500"></canvas>
+            </div>
+            
+            <div class="info-panel">
+                <div class="status" id="status">Clique em "Gerar Cidades" para começar</div>
+            <div class="info-card">
+                <h3>📊 Estatísticas</h3>
+                <p style="margin: 5px 0; font-size: 0.9rem;"><strong>Cidades:</strong> <span id="cityCount">0</span></p>
+                <p style="margin: 5px 0; font-size: 0.9rem;"><strong>Distância Atual:</strong> <span id="currentDistance">0</span></p>
+                <p style="margin: 5px 0; font-size: 0.9rem;"><strong>Melhor Distância:</strong> <span id="bestDistance">∞</span></p>
+                <p style="margin: 5px 0; font-size: 0.9rem;"><strong>Caminhos Testados:</strong> <span id="pathsTested">0</span></p>
+            </div>
+            
+            <div class="info-card">
+                <h3>🎯 Sobre o Problema</h3>
+                <p style="margin: 5px 0; font-size: 0.85rem;">O Problema do Caixeiro Viajante (TSP) busca o menor caminho que visita todas as cidades uma vez e retorna ao início. É um problema NP-difícil, sem solução polinomial conhecida.</p>
+            </div>
+            
+            <div class="info-card">
+                <h3>🔧 Algoritmos</h3>
+                <p style="margin: 5px 0; font-size: 0.85rem;"><strong>Força Bruta:</strong> Testa todas as permutações possíveis (muito lento para muitas cidades)</p>
+                <p style="margin: 5px 0; font-size: 0.85rem;"><strong>Vizinho Mais Próximo:</strong> Heurística gulosa que escolhe sempre a cidade mais próxima</p>
+                <p style="margin: 0; font-size: 0.85rem;"><strong>Algoritmo Genético:</strong> Usa evolução simulada para encontrar boas soluções</p>
+            </div>
+        </div>
+        
+    </div>
+
+    <script>
+        const canvas = document.getElementById('tspCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        let cities = [];
+        let currentPath = [];
+        let bestPath = [];
+        let bestDistance = Infinity;
+        let currentDistance = 0;
+        let pathsTested = 0;
+        let animationId = null;
+        let isAnimating = false;
+        let currentStep = 0;
+        let allPaths = [];
+        let currentCity = -1;
+        
+        // Gerar cidades aleatórias
+        function generateCities() {
+            const numCities = 8;
+            cities = [];
+            
+            // Gerar posições aleatórias com espaçamento mínimo
+            for (let i = 0; i < numCities; i++) {
+                let x, y, validPosition;
+                do {
+                    x = 100 + Math.random() * (canvas.width - 200);
+                    y = 100 + Math.random() * (canvas.height - 200);
+                    validPosition = true;
+                    
+                    // Verificar distância mínima de outras cidades
+                    for (let j = 0; j < cities.length; j++) {
+                        const distance = Math.sqrt((x - cities[j].x) ** 2 + (y - cities[j].y) ** 2);
+                        if (distance < 80) {
+                            validPosition = false;
+                            break;
+                        }
+                    }
+                } while (!validPosition);
+                
+                cities.push({
+                    x: x,
+                    y: y,
+                    name: String.fromCharCode(65 + i)
+                });
+            }
+            
+            resetAnimation();
+            drawCanvas();
+            updateStatus('Cidades geradas! Escolha um algoritmo e clique em "Iniciar Animação"');
+            document.getElementById('cityCount').textContent = cities.length;
+        }
+        
+        // Calcular distância entre duas cidades
+        function calculateDistance(city1, city2) {
+            return Math.sqrt((city1.x - city2.x) ** 2 + (city1.y - city2.y) ** 2);
+        }
+        
+        // Calcular distância total de um caminho
+        function calculateTotalDistance(path) {
+            let total = 0;
+            for (let i = 0; i < path.length; i++) {
+                const current = cities[path[i]];
+                const next = cities[path[(i + 1) % path.length]];
+                total += calculateDistance(current, next);
+            }
+            return total;
+        }
+        
+        // Algoritmo de força bruta
+        function generateAllPermutations(arr) {
+            if (arr.length <= 1) return [arr];
+            
+            const result = [];
+            for (let i = 0; i < arr.length; i++) {
+                const rest = [...arr.slice(0, i), ...arr.slice(i + 1)];
+                const perms = generateAllPermutations(rest);
+                for (const perm of perms) {
+                    result.push([arr[i], ...perm]);
+                }
+            }
+            return result;
+        }
+        
+        // Algoritmo do vizinho mais próximo
+        function nearestNeighborStep() {
+            if (currentPath.length === 0) {
+                currentPath = [0]; // Começar da primeira cidade
+                currentCity = 0;
+                return true;
+            }
+            
+            if (currentPath.length === cities.length) {
+                // Completou o tour
+                const distance = calculateTotalDistance(currentPath);
+                if (distance < bestDistance) {
+                    bestDistance = distance;
+                    bestPath = [...currentPath];
+                }
+                return false;
+            }
+            
+            // Encontrar a cidade não visitada mais próxima
+            let nearestCity = -1;
+            let nearestDistance = Infinity;
+            
+            for (let i = 0; i < cities.length; i++) {
+                if (!currentPath.includes(i)) {
+                    const distance = calculateDistance(cities[currentCity], cities[i]);
+                    if (distance < nearestDistance) {
+                        nearestDistance = distance;
+                        nearestCity = i;
+                    }
+                }
+            }
+            
+            if (nearestCity !== -1) {
+                currentPath.push(nearestCity);
+                currentCity = nearestCity;
+            }
+            
+            return currentPath.length < cities.length;
+        }
+        
+        // Algoritmo genético (versão simplificada)
+        function geneticAlgorithmStep() {
+            // Implementação simplificada - apenas teste de caminhos aleatórios
+            if (pathsTested === 0) {
+                currentPath = Array.from({length: cities.length}, (_, i) => i);
+            }
+            
+            // Embaralhar o caminho (mutação)
+            for (let i = cities.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [currentPath[i], currentPath[j]] = [currentPath[j], currentPath[i]];
+            }
+            
+            const distance = calculateTotalDistance(currentPath);
+            if (distance < bestDistance) {
+                bestDistance = distance;
+                bestPath = [...currentPath];
+            }
+            
+            pathsTested++;
+            return pathsTested < 100; // Parar após 100 iterações
+        }
+        
+        // Iniciar animação
+        function startAnimation() {
+            if (cities.length === 0) {
+                alert('Primeiro gere algumas cidades!');
+                return;
+            }
+            
+            if (isAnimating) return;
+            
+            const algorithm = document.getElementById('algorithm').value;
+            
+            resetAnimation();
+            isAnimating = true;
+            
+            if (algorithm === 'bruteForce') {
+                if (cities.length > 8) {
+                    alert('Força bruta é muito lenta para mais de 8 cidades!');
+                    return;
+                }
+                allPaths = generateAllPermutations(Array.from({length: cities.length}, (_, i) => i));
+                updateStatus('Executando força bruta...');
+            } else {
+                updateStatus(`Executando ${algorithm === 'nearestNeighbor' ? 'vizinho mais próximo' : 'algoritmo genético'}...`);
+            }
+            
+            animate();
+        }
+        
+        // Loop de animação
+        function animate() {
+            if (!isAnimating) return;
+            
+            const algorithm = document.getElementById('algorithm').value;
+            let hasNext = true;
+            
+            if (algorithm === 'bruteForce') {
+                if (currentStep < allPaths.length) {
+                    currentPath = allPaths[currentStep];
+                    const distance = calculateTotalDistance(currentPath);
+                    if (distance < bestDistance) {
+                        bestDistance = distance;
+                        bestPath = [...currentPath];
+                    }
+                    pathsTested = currentStep + 1;
+                    currentStep++;
+                } else {
+                    hasNext = false;
+                }
+            } else if (algorithm === 'nearestNeighbor') {
+                hasNext = nearestNeighborStep();
+            } else if (algorithm === 'genetic') {
+                hasNext = geneticAlgorithmStep();
+            }
+            
+            currentDistance = calculateTotalDistance(currentPath);
+            updateUI();
+            drawCanvas();
+            
+            if (hasNext) {
+                animationId = setTimeout(animate, algorithm === 'bruteForce' ? 50 : 100);
+            } else {
+                isAnimating = false;
+                updateStatus('Animação concluída! Melhor caminho encontrado.');
+                showOptimalPath();
+            }
+        }
+        
+        // Pausar animação
+        function pauseAnimation() {
+            isAnimating = false;
+            if (animationId) {
+                clearTimeout(animationId);
+            }
+            updateStatus('Animação pausada');
+        }
+        
+        // Resetar animação
+        function resetAnimation() {
+            isAnimating = false;
+            if (animationId) {
+                clearTimeout(animationId);
+            }
+            
+            currentPath = [];
+            bestPath = [];
+            bestDistance = Infinity;
+            currentDistance = 0;
+            pathsTested = 0;
+            currentStep = 0;
+            allPaths = [];
+            currentCity = -1;
+            
+            updateUI();
+            drawCanvas();
+        }
+        
+        // Mostrar caminho ótimo
+        function showOptimalPath() {
+            if (bestPath.length > 0) {
+                currentPath = [...bestPath];
+                currentDistance = bestDistance;
+                drawCanvas();
+                updateStatus(`Melhor caminho encontrado! Distância: ${bestDistance.toFixed(2)}`);
+            }
+        }
+        
+        // Atualizar interface
+        function updateUI() {
+            document.getElementById('currentDistance').textContent = currentDistance.toFixed(2);
+            document.getElementById('bestDistance').textContent = bestDistance === Infinity ? '∞' : bestDistance.toFixed(2);
+            document.getElementById('pathsTested').textContent = pathsTested;
+        }
+        
+        // Atualizar status
+        function updateStatus(message) {
+            document.getElementById('status').textContent = message;
+        }
+        
+        // Desenhar canvas
+        function drawCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Desenhar conexões do caminho atual
+            if (currentPath.length > 1) {
+                ctx.strokeStyle = currentPath === bestPath ? '#27ae60' : '#e74c3c';
+                ctx.lineWidth = 3;
+                ctx.setLineDash([]);
+                
+                ctx.beginPath();
+                for (let i = 0; i < currentPath.length; i++) {
+                    const current = cities[currentPath[i]];
+                    const next = cities[currentPath[(i + 1) % currentPath.length]];
+                    
+                    if (i === 0) {
+                        ctx.moveTo(current.x, current.y);
+                    }
+                    ctx.lineTo(next.x, next.y);
+                }
+                ctx.stroke();
+                
+                // Desenhar setas direcionais
+                ctx.fillStyle = currentPath === bestPath ? '#27ae60' : '#e74c3c';
+                for (let i = 0; i < currentPath.length; i++) {
+                    const current = cities[currentPath[i]];
+                    const next = cities[currentPath[(i + 1) % currentPath.length]];
+                    drawArrow(current.x, current.y, next.x, next.y);
+                }
+            }
+            
+            // Desenhar todas as conexões possíveis (linhas pontilhadas fracas)
+            ctx.strokeStyle = 'rgba(120, 120, 120, 0.6)';
+            ctx.lineWidth = 1;
+            ctx.setLineDash([5, 5]);
+            
+            for (let i = 0; i < cities.length; i++) {
+                for (let j = i + 1; j < cities.length; j++) {
+                    ctx.beginPath();
+                    ctx.moveTo(cities[i].x, cities[i].y);
+                    ctx.lineTo(cities[j].x, cities[j].y);
+                    ctx.stroke();
+                }
+            }
+            
+            ctx.setLineDash([]);
+            
+            // Desenhar cidades
+            for (let i = 0; i < cities.length; i++) {
+                const city = cities[i];
+                
+                // Destaque para cidade atual
+                if (i === currentCity) {
+                    ctx.fillStyle = '#f39c12';
+                    ctx.beginPath();
+                    ctx.arc(city.x, city.y, 25, 0, 2 * Math.PI);
+                    ctx.fill();
+                }
+                
+                // Círculo da cidade
+                ctx.fillStyle = '#3498db';
+                ctx.beginPath();
+                ctx.arc(city.x, city.y, 20, 0, 2 * Math.PI);
+                ctx.fill();
+                
+                // Borda
+                ctx.strokeStyle = '#2980b9';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+                
+                // Nome da cidade
+                ctx.fillStyle = 'white';
+                ctx.font = 'bold 16px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(city.name, city.x, city.y);
+            }
+        }
+        
+        // Desenhar seta
+        function drawArrow(fromX, fromY, toX, toY) {
+            const angle = Math.atan2(toY - fromY, toX - fromX);
+            const distance = Math.sqrt((toX - fromX) ** 2 + (toY - fromY) ** 2);
+            
+            // Posição da seta (no meio do caminho)
+            const arrowX = fromX + (toX - fromX) * 0.6;
+            const arrowY = fromY + (toY - fromY) * 0.6;
+            
+            const arrowLength = 15;
+            const arrowAngle = Math.PI / 6;
+            
+            ctx.beginPath();
+            ctx.moveTo(arrowX, arrowY);
+            ctx.lineTo(
+                arrowX - arrowLength * Math.cos(angle - arrowAngle),
+                arrowY - arrowLength * Math.sin(angle - arrowAngle)
+            );
+            ctx.moveTo(arrowX, arrowY);
+            ctx.lineTo(
+                arrowX - arrowLength * Math.cos(angle + arrowAngle),
+                arrowY - arrowLength * Math.sin(angle + arrowAngle)
+            );
+            ctx.lineWidth = 2;
+            ctx.stroke();
+        }
+        
+        // Inicializar
+        generateCities();
+    </script>
+</body>
+</html>

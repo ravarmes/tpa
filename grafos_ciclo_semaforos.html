@@ -1,0 +1,1090 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ciclo de Semáforos - Teoria dos Grafos</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Arial', sans-serif;
+            color: white;
+        }
+        
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .title {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        
+        .main-area {
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+        }
+        
+        .simulation-container {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        .graph-container {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            width: 400px;
+        }
+        
+        .graph-title {
+            color: #333;
+            text-align: center;
+            margin-bottom: 15px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        
+        .phase-timeline {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            width: 100%;
+            max-width: 1000px;
+        }
+        
+        .timeline-title {
+            color: #333;
+            text-align: center;
+            margin-bottom: 15px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .control-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            background: #4CAF50;
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        .control-btn:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+        }
+        
+        .control-btn.pause {
+            background: #ff9800;
+        }
+        
+        .control-btn.pause:hover {
+            background: #f57c00;
+        }
+        
+        .status {
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+            text-align: center;
+            min-width: 350px;
+        }
+        
+        .phase-indicator {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .phase-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .phase-dot.active {
+            background: #4CAF50;
+            transform: scale(1.2);
+        }
+        
+        .speed-control {
+            color: white;
+            margin-left: 20px;
+        }
+        
+        .speed-control input {
+            margin: 0 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="title">
+            <h1>🚦 Semáforos e Teoria dos Grafos</h1>
+            <p>Visualização simplificada com 2 cruzamentos e representação em grafo</p>
+        </div>
+        
+        <div class="main-area">
+            <div class="simulation-container">
+                <canvas id="trafficCanvas" width="600" height="400"></canvas>
+            </div>
+            
+            <div class="graph-container">
+                <div class="graph-title">Representação em Grafo</div>
+                <canvas id="graphCanvas" width="360" height="300"></canvas>
+                <div style="color: #333; font-size: 12px; margin-top: 10px;">
+                    <strong>Vértices:</strong> Cruzamentos (A, B)<br>
+                    <strong>Arestas:</strong> Fluxos de tráfego<br>
+                    <strong>Estados:</strong> Fases dos semáforos
+                </div>
+            </div>
+        </div>
+        
+        <div class="phase-timeline">
+            <div class="timeline-title">Timeline das Fases do Semáforo</div>
+            <canvas id="timelineCanvas" width="960" height="120"></canvas>
+        </div>
+        
+        <div class="controls">
+            <button id="startBtn" class="control-btn">▶️ Iniciar</button>
+            <button id="pauseBtn" class="control-btn pause">⏸️ Pausar</button>
+            <button id="resetBtn" class="control-btn">🔄 Reiniciar</button>
+            <div class="speed-control">
+                <label>
+                    <input type="range" id="speedSlider" min="0.5" max="2" step="0.1" value="1">
+                    Velocidade: <span id="speedValue">1x</span>
+                </label>
+            </div>
+        </div>
+        
+        <div class="status">
+            <div><strong>Estágio Atual:</strong> <span id="currentStage">1</span></div>
+            <div><strong>Tempo do Estágio:</strong> <span id="stageTimer">0</span>s / <span id="stageDuration">25</span>s</div>
+            <div><strong>Carros na Simulação:</strong> <span id="carsCount">0</span></div>
+            <div><strong>Carros Processados:</strong> <span id="carsProcessed">0</span></div>
+            <div class="phase-indicator">
+                <div class="phase-dot active" data-phase="1"></div>
+                <div class="phase-dot" data-phase="2"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('trafficCanvas');
+        const ctx = canvas.getContext('2d');
+        const graphCanvas = document.getElementById('graphCanvas');
+        const graphCtx = graphCanvas.getContext('2d');
+        const timelineCanvas = document.getElementById('timelineCanvas');
+        const timelineCtx = timelineCanvas.getContext('2d');
+        
+        // Estado da simulação
+        let isRunning = false;
+        let currentStage = 1;
+        let stageTimer = 0;
+        let totalTimer = 0;
+        let carsProcessed = 0;
+        let simulationSpeed = 1;
+        
+        // Configurações dos estágios simplificadas
+        const stages = {
+            1: { 
+                duration: 25, 
+                activeDirections: ['north-south'], // Apenas fluxo norte-sul
+                description: 'Fluxo Norte-Sul',
+                color: '#4CAF50'
+            },
+            2: { 
+                duration: 20, 
+                activeDirections: ['east-west'], // Apenas fluxo leste-oeste
+                description: 'Fluxo Leste-Oeste',
+                color: '#FF9800'
+            }
+        };
+        
+        // Posições dos cruzamentos simplificadas para 2
+        const intersections = [
+            { x: 150, y: 200, id: 'A' },
+            { x: 450, y: 200, id: 'B' }
+        ];
+        
+        // Carros
+        let cars = [];
+        let carIdCounter = 0;
+        
+        class Car {
+            constructor(lane) {
+                this.id = carIdCounter++;
+                this.lane = lane;
+                this.x = lane.startX;
+                this.y = lane.startY;
+                this.targetX = lane.endX;
+                this.targetY = lane.endY;
+                this.speed = (1.2 + Math.random() * 0.8) * simulationSpeed;
+                this.baseSpeed = this.speed;
+                this.waiting = false;
+                this.color = this.getRandomColor();
+                this.width = 16;
+                this.height = 10;
+                this.processed = false;
+                this.direction = lane.direction;
+                this.stopLine = lane.stopLine;
+                this.intersection = lane.intersection;
+                this.movementType = lane.movementType;
+            }
+            
+            getRandomColor() {
+                const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD', '#98FB98', '#F0E68C'];
+                return colors[Math.floor(Math.random() * colors.length)];
+            }
+            
+            checkCollisionWithCars() {
+                const safeDistance = 25;
+                
+                // REGRA ESPECIAL: Não entrar na zona de segurança se há carros lá
+                for (let intersection of intersections) {
+                    if (this.wouldEnterSafetyZone(intersection)) {
+                        // Verificar se há carros na zona de segurança deste cruzamento
+                        for (let other of cars) {
+                            if (other.id === this.id) continue;
+                            if (other.isInSafetyZoneOf(intersection)) {
+                                return true; // Esperar carros sairem da zona
+                            }
+                        }
+                    }
+                }
+                
+                // Se já passou de todos os semáforos, verificação simples
+                if (this.hasPassedAllLights()) {
+                    for (let other of cars) {
+                        if (other.id === this.id) continue;
+                        
+                        let distance = Math.sqrt(Math.pow(other.x - this.x, 2) + Math.pow(other.y - this.y, 2));
+                        
+                        if (distance < 15) {
+                            if (this.direction === 'horizontal') {
+                                if (this.movementType === 'east' && other.x > this.x) return true;
+                                if (this.movementType === 'west' && other.x < this.x) return true;
+                            } else {
+                                if (this.movementType === 'south' && other.y > this.y) return true;
+                                if (this.movementType === 'north' && other.y < this.y) return true;
+                            }
+                        }
+                    }
+                    return false;
+                }
+                
+                // Lógica normal para carros que ainda não passaram
+                for (let other of cars) {
+                    if (other.id === this.id) continue;
+                    
+                    let distance = Math.sqrt(Math.pow(other.x - this.x, 2) + Math.pow(other.y - this.y, 2));
+                    
+                    if (distance < safeDistance) {
+                        // Verificar se o outro carro está na frente
+                        if (this.direction === 'horizontal') {
+                            if (this.movementType === 'east' && other.x > this.x) return true;
+                            if (this.movementType === 'west' && other.x < this.x) return true;
+                        } else {
+                            if (this.movementType === 'south' && other.y > this.y) return true;
+                            if (this.movementType === 'north' && other.y < this.y) return true;
+                        }
+                    }
+                }
+                return false;
+            }
+            
+            shouldStopAtLight() {
+                const activeDirections = stages[currentStage].activeDirections;
+                let canPass = false;
+                
+                // Verificar se o movimento atual está permitido
+                if (activeDirections.includes('north-south') && 
+                    (this.movementType === 'north' || this.movementType === 'south')) {
+                    canPass = true;
+                }
+                if (activeDirections.includes('east-west') && 
+                    (this.movementType === 'east' || this.movementType === 'west')) {
+                    canPass = true;
+                }
+                if (activeDirections.includes('left-turns') && 
+                    this.movementType.includes('left')) {
+                    canPass = true;
+                }
+                
+                if (canPass) return false;
+                
+                // Verificar TODOS os cruzamentos no caminho, não apenas o associado
+                for (let intersection of intersections) {
+                    // Pular se já passou deste cruzamento
+                    if (this.hasPassedIntersection(intersection)) continue;
+                    
+                    // Pular se está na zona de segurança deste cruzamento
+                    if (this.isInSafetyZoneOf(intersection)) continue;
+                    
+                    // Calcular se está se aproximando deste cruzamento
+                    let isApproaching = false;
+                    if (this.direction === 'horizontal') {
+                        if (this.movementType === 'east') {
+                            // Indo para leste: parar se está se aproximando do cruzamento
+                            const stopLineX = intersection.x - 20;
+                            isApproaching = this.x < stopLineX && (stopLineX - this.x) < 35;
+                        } else {
+                            // Indo para oeste: parar se está se aproximando do cruzamento
+                            const stopLineX = intersection.x + 20;
+                            isApproaching = this.x > stopLineX && (this.x - stopLineX) < 35;
+                        }
+                    } else {
+                        if (this.movementType === 'south') {
+                            // Indo para sul: parar se está se aproximando do cruzamento
+                            const stopLineY = intersection.y - 20;
+                            isApproaching = this.y < stopLineY && (stopLineY - this.y) < 35;
+                        } else {
+                            // Indo para norte: parar se está se aproximando do cruzamento
+                            const stopLineY = intersection.y + 20;
+                            isApproaching = this.y > stopLineY && (this.y - stopLineY) < 35;
+                        }
+                    }
+                    
+                    if (isApproaching) return true;
+                }
+                
+                return false;
+            }
+            
+            isInSafetyZone() {
+                if (!this.intersection) return false;
+                
+                // Verificar se está dentro da zona de segurança (área branca 40x40)
+                const centerX = this.intersection.x;
+                const centerY = this.intersection.y;
+                
+                return (this.x >= centerX - 20 && this.x <= centerX + 20 &&
+                        this.y >= centerY - 20 && this.y <= centerY + 20);
+            }
+            
+            isInSafetyZoneOf(intersection) {
+                // Verificar se está dentro da zona de segurança de um cruzamento específico
+                const centerX = intersection.x;
+                const centerY = intersection.y;
+                
+                return (this.x >= centerX - 20 && this.x <= centerX + 20 &&
+                        this.y >= centerY - 20 && this.y <= centerY + 20);
+            }
+            
+            isInAnySafetyZone() {
+                // Verificar se está em qualquer zona de segurança
+                for (let intersection of intersections) {
+                    if (this.isInSafetyZoneOf(intersection)) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+            
+            checkCollisionInSafetyZone() {
+                // Verificação de colisão especial para carros na zona de segurança
+                // Apenas evita colisões muito próximas (5px)
+                const veryCloseDistance = 8;
+                
+                for (let other of cars) {
+                    if (other.id === this.id) continue;
+                    
+                    let distance = Math.sqrt(Math.pow(other.x - this.x, 2) + Math.pow(other.y - this.y, 2));
+                    
+                    if (distance < veryCloseDistance) {
+                        // Verificar se o outro carro está na frente (mesma direção)
+                        if (this.direction === 'horizontal') {
+                            if (this.movementType === 'east' && other.x > this.x) return true;
+                            if (this.movementType === 'west' && other.x < this.x) return true;
+                        } else {
+                            if (this.movementType === 'south' && other.y > this.y) return true;
+                            if (this.movementType === 'north' && other.y < this.y) return true;
+                        }
+                    }
+                }
+                return false;
+            }
+            
+            hasPassedLight() {
+                if (!this.intersection) return true; // Se não há semáforo, pode continuar
+                
+                // Verificar se já passou da zona de segurança do cruzamento
+                if (this.direction === 'horizontal') {
+                    if (this.movementType === 'east') {
+                        // Indo para leste, passou se x > stopLine + 40
+                        return this.x > this.stopLine + 40;
+                    } else {
+                        // Indo para oeste, passou se x < stopLine - 40
+                        return this.x < this.stopLine - 40;
+                    }
+                } else {
+                    if (this.movementType === 'south') {
+                        // Indo para sul, passou se y > stopLine + 40
+                        return this.y > this.stopLine + 40;
+                    } else {
+                        // Indo para norte, passou se y < stopLine - 40
+                        return this.y < this.stopLine - 40;
+                    }
+                }
+            }
+            
+            hasPassedIntersection(intersection) {
+                // Verificar se já passou de um cruzamento específico
+                if (this.direction === 'horizontal') {
+                    if (this.movementType === 'east') {
+                        // Indo para leste, passou se x > intersection.x + 20
+                        return this.x > intersection.x + 20;
+                    } else {
+                        // Indo para oeste, passou se x < intersection.x - 20
+                        return this.x < intersection.x - 20;
+                    }
+                } else {
+                    if (this.movementType === 'south') {
+                        // Indo para sul, passou se y > intersection.y + 20
+                        return this.y > intersection.y + 20;
+                    } else {
+                        // Indo para norte, passou se y < intersection.y - 20
+                        return this.y < intersection.y - 20;
+                    }
+                }
+            }
+            
+            wouldEnterSafetyZone(intersection) {
+                // Verificar se está prestes a entrar na zona de segurança (próximos 15px)
+                const futureDistance = 15;
+                
+                if (this.direction === 'horizontal') {
+                    if (this.movementType === 'east') {
+                        // Indo para leste: entraria se está próximo da borda esquerda da zona
+                        const leftEdge = intersection.x - 20;
+                        return this.x >= leftEdge - futureDistance && this.x < leftEdge;
+                    } else {
+                        // Indo para oeste: entraria se está próximo da borda direita da zona
+                        const rightEdge = intersection.x + 20;
+                        return this.x <= rightEdge + futureDistance && this.x > rightEdge;
+                    }
+                } else {
+                    if (this.movementType === 'south') {
+                        // Indo para sul: entraria se está próximo da borda superior da zona
+                        const topEdge = intersection.y - 20;
+                        return this.y >= topEdge - futureDistance && this.y < topEdge;
+                    } else {
+                        // Indo para norte: entraria se está próximo da borda inferior da zona
+                        const bottomEdge = intersection.y + 20;
+                        return this.y <= bottomEdge + futureDistance && this.y > bottomEdge;
+                    }
+                }
+            }
+            
+            hasPassedAllLights() {
+                // Verificar se já passou de todos os cruzamentos relevantes
+                for (let intersection of intersections) {
+                    if (!this.hasPassedIntersection(intersection)) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+            
+            update() {
+                this.speed = this.baseSpeed * simulationSpeed;
+                
+                // PRIORIDADE ABSOLUTA: Se está na zona de segurança, DEVE sair!
+                const isInAnySafetyZone = this.isInAnySafetyZone();
+                
+                if (isInAnySafetyZone) {
+                    // Na zona de segurança: apenas verifica colisão com carros muito próximos
+                    const shouldStopCar = this.checkCollisionInSafetyZone();
+                    this.waiting = shouldStopCar;
+                } else {
+                    // Fora da zona: lógica normal
+                    const shouldStopLight = this.shouldStopAtLight();
+                    const shouldStopCar = this.checkCollisionWithCars();
+                    this.waiting = shouldStopLight || shouldStopCar;
+                }
+                
+                if (this.waiting) return;
+                
+                // Mover em direção ao alvo
+                const dx = this.targetX - this.x;
+                const dy = this.targetY - this.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                
+                if (distance > this.speed) {
+                    this.x += (dx / distance) * this.speed;
+                    this.y += (dy / distance) * this.speed;
+                } else {
+                    // Chegou ao final da via, marcar como processado
+                    if (!this.processed) {
+                        this.processed = true;
+                        carsProcessed++;
+                    }
+                    
+                    // Continuar movimento para sair da tela
+                    this.x += (dx / distance) * this.speed;
+                    this.y += (dy / distance) * this.speed;
+                }
+            }
+            
+            draw() {
+                ctx.save();
+                
+                // Rotacionar baseado na direção
+                ctx.translate(this.x, this.y);
+                if (this.direction === 'vertical') {
+                    if (this.targetY > this.y || (this.targetY === this.y && this.lane.startY < this.lane.endY)) {
+                        ctx.rotate(Math.PI / 2);
+                    } else {
+                        ctx.rotate(-Math.PI / 2);
+                    }
+                } else {
+                    if (this.targetX < this.x || (this.targetX === this.x && this.lane.startX > this.lane.endX)) {
+                        ctx.rotate(Math.PI);
+                    }
+                }
+                
+                // Corpo do carro
+                ctx.fillStyle = this.color;
+                ctx.fillRect(-this.width/2, -this.height/2, this.width, this.height);
+                
+                // Detalhes do carro
+                ctx.fillStyle = '#333';
+                ctx.fillRect(-this.width/2 + 2, -this.height/2 + 1, 4, this.height - 2);
+                ctx.fillRect(this.width/2 - 6, -this.height/2 + 1, 4, this.height - 2);
+                
+                // Para-brisa
+                ctx.fillStyle = '#87CEEB';
+                ctx.fillRect(-this.width/2 + 6, -this.height/2 + 2, this.width - 12, this.height - 4);
+                
+                ctx.restore();
+                
+                // Indicador de espera
+                if (this.waiting) {
+                    ctx.fillStyle = 'red';
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y - 20, 3, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+        }
+        
+        // Definir as pistas corrigidas para mão direita (padrão brasileiro)
+        const lanes = [
+            // Fluxos horizontais (passam por ambos os cruzamentos)
+            { startX: -50, startY: 210, endX: 650, endY: 210, direction: 'horizontal', intersection: intersections[0], movementType: 'east' },
+            { startX: 650, startY: 190, endX: -50, endY: 190, direction: 'horizontal', intersection: intersections[0], movementType: 'west' },
+            
+            // Fluxos verticais do Cruzamento A (150, 200)
+            { startX: 140, startY: -50, endX: 140, endY: 450, direction: 'vertical', intersection: intersections[0], movementType: 'south' },
+            { startX: 160, startY: 450, endX: 160, endY: -50, direction: 'vertical', intersection: intersections[0], movementType: 'north' },
+            
+            // Fluxos verticais do Cruzamento B (450, 200)
+            { startX: 440, startY: -50, endX: 440, endY: 450, direction: 'vertical', intersection: intersections[1], movementType: 'south' },
+            { startX: 460, startY: 450, endX: 460, endY: -50, direction: 'vertical', intersection: intersections[1], movementType: 'north' }
+        ];
+        
+        function drawRoads() {
+            ctx.fillStyle = '#333';
+            
+            // Estrada horizontal (conectando os 2 cruzamentos)
+            ctx.fillRect(0, 180, 600, 40);
+            
+            // Estradas verticais nos cruzamentos
+            ctx.fillRect(130, 0, 40, 400);   // Cruzamento A
+            ctx.fillRect(430, 0, 40, 400);   // Cruzamento B
+            
+            // Linhas centrais das vias
+            ctx.strokeStyle = '#FFFF00';
+            ctx.setLineDash([15, 10]);
+            ctx.lineWidth = 2;
+            
+            ctx.beginPath();
+            // Horizontal
+            ctx.moveTo(0, 200);
+            ctx.lineTo(600, 200);
+            // Verticais
+            ctx.moveTo(150, 0);
+            ctx.lineTo(150, 400);
+            ctx.moveTo(450, 0);
+            ctx.lineTo(450, 400);
+            ctx.stroke();
+            
+            ctx.setLineDash([]);
+        }
+        
+        function drawGraph() {
+            graphCtx.clearRect(0, 0, 360, 300);
+            
+            // Fundo
+            graphCtx.fillStyle = '#f8f9fa';
+            graphCtx.fillRect(0, 0, 360, 300);
+            
+            // Título
+            graphCtx.fillStyle = '#333';
+            graphCtx.font = 'bold 16px Arial';
+            graphCtx.textAlign = 'center';
+            graphCtx.fillText('Grafo dos Cruzamentos', 180, 25);
+            
+            // Posições dos vértices do grafo
+            const nodeA = { x: 80, y: 150 };
+            const nodeB = { x: 280, y: 150 };
+            
+            // Desenhar arestas (fluxos)
+            const activeDirections = stages[currentStage].activeDirections;
+            
+            // Aresta horizontal (A para B)
+            if (activeDirections.includes('east-west')) {
+                graphCtx.strokeStyle = '#4CAF50';
+                graphCtx.lineWidth = 4;
+            } else {
+                graphCtx.strokeStyle = '#ccc';
+                graphCtx.lineWidth = 2;
+            }
+            graphCtx.beginPath();
+            graphCtx.moveTo(nodeA.x + 25, nodeA.y);
+            graphCtx.lineTo(nodeB.x - 25, nodeB.y);
+            graphCtx.stroke();
+            
+            // Aresta horizontal (B para A)
+            if (activeDirections.includes('east-west')) {
+                graphCtx.strokeStyle = '#4CAF50';
+                graphCtx.lineWidth = 4;
+            } else {
+                graphCtx.strokeStyle = '#ccc';
+                graphCtx.lineWidth = 2;
+            }
+            graphCtx.beginPath();
+            graphCtx.moveTo(nodeB.x - 25, nodeB.y + 10);
+            graphCtx.lineTo(nodeA.x + 25, nodeA.y + 10);
+            graphCtx.stroke();
+            
+            // Arestas verticais (fluxos norte-sul em cada cruzamento)
+            // Cruzamento A
+            if (activeDirections.includes('north-south')) {
+                graphCtx.strokeStyle = '#4CAF50';
+                graphCtx.lineWidth = 4;
+            } else {
+                graphCtx.strokeStyle = '#ccc';
+                graphCtx.lineWidth = 2;
+            }
+            graphCtx.beginPath();
+            graphCtx.moveTo(nodeA.x - 10, nodeA.y - 25);
+            graphCtx.lineTo(nodeA.x - 10, nodeA.y + 25);
+            graphCtx.stroke();
+            
+            graphCtx.beginPath();
+            graphCtx.moveTo(nodeA.x + 10, nodeA.y + 25);
+            graphCtx.lineTo(nodeA.x + 10, nodeA.y - 25);
+            graphCtx.stroke();
+            
+            // Cruzamento B
+            graphCtx.beginPath();
+            graphCtx.moveTo(nodeB.x - 10, nodeB.y - 25);
+            graphCtx.lineTo(nodeB.x - 10, nodeB.y + 25);
+            graphCtx.stroke();
+            
+            graphCtx.beginPath();
+            graphCtx.moveTo(nodeB.x + 10, nodeB.y + 25);
+            graphCtx.lineTo(nodeB.x + 10, nodeB.y - 25);
+            graphCtx.stroke();
+            
+            // Desenhar vértices
+            [nodeA, nodeB].forEach((node, index) => {
+                // Círculo do vértice
+                graphCtx.fillStyle = '#2196F3';
+                graphCtx.beginPath();
+                graphCtx.arc(node.x, node.y, 20, 0, Math.PI * 2);
+                graphCtx.fill();
+                
+                // Borda
+                graphCtx.strokeStyle = '#1976D2';
+                graphCtx.lineWidth = 2;
+                graphCtx.stroke();
+                
+                // Label
+                graphCtx.fillStyle = 'white';
+                graphCtx.font = 'bold 16px Arial';
+                graphCtx.textAlign = 'center';
+                graphCtx.fillText(intersections[index].id, node.x, node.y + 5);
+            });
+            
+            // Legenda
+            graphCtx.fillStyle = '#333';
+            graphCtx.font = '12px Arial';
+            graphCtx.textAlign = 'left';
+            
+            // Fluxo ativo
+            graphCtx.fillStyle = '#4CAF50';
+            graphCtx.fillRect(20, 220, 20, 4);
+            graphCtx.fillStyle = '#333';
+            graphCtx.fillText('Fluxo Ativo (Verde)', 50, 227);
+            
+            // Fluxo bloqueado
+            graphCtx.fillStyle = '#ccc';
+            graphCtx.fillRect(20, 240, 20, 2);
+            graphCtx.fillStyle = '#333';
+            graphCtx.fillText('Fluxo Bloqueado (Vermelho)', 50, 247);
+            
+            // Estado atual
+            graphCtx.fillStyle = '#333';
+            graphCtx.font = 'bold 14px Arial';
+            graphCtx.fillText(`Estado: ${stages[currentStage].description}`, 20, 270);
+        }
+        
+        function drawTimeline() {
+            timelineCtx.clearRect(0, 0, 960, 120);
+            
+            // Fundo
+            timelineCtx.fillStyle = '#f8f9fa';
+            timelineCtx.fillRect(0, 0, 960, 120);
+            
+            const totalDuration = stages[1].duration + stages[2].duration;
+            const scale = 800 / totalDuration; // 800px para a timeline
+            const startX = 80;
+            
+            // Calcular tempo atual no ciclo
+            let currentCycleTime = totalTimer % (totalDuration * 60 / simulationSpeed);
+            currentCycleTime = currentCycleTime * simulationSpeed / 60;
+            
+            // Desenhar barras das fases
+            let currentX = startX;
+            
+            // Fase 1 (Norte-Sul)
+            timelineCtx.fillStyle = stages[1].color;
+            const phase1Width = stages[1].duration * scale;
+            timelineCtx.fillRect(currentX, 30, phase1Width, 30);
+            
+            // Label fase 1
+            timelineCtx.fillStyle = 'white';
+            timelineCtx.font = 'bold 12px Arial';
+            timelineCtx.textAlign = 'center';
+            timelineCtx.fillText('Norte-Sul', currentX + phase1Width/2, 50);
+            
+            currentX += phase1Width;
+            
+            // Fase 2 (Leste-Oeste)
+            timelineCtx.fillStyle = stages[2].color;
+            const phase2Width = stages[2].duration * scale;
+            timelineCtx.fillRect(currentX, 30, phase2Width, 30);
+            
+            // Label fase 2
+            timelineCtx.fillStyle = 'white';
+            timelineCtx.font = 'bold 12px Arial';
+            timelineCtx.textAlign = 'center';
+            timelineCtx.fillText('Leste-Oeste', currentX + phase2Width/2, 50);
+            
+            // Indicador de tempo atual
+            const currentXPos = startX + (currentCycleTime * scale);
+            timelineCtx.strokeStyle = '#e74c3c';
+            timelineCtx.lineWidth = 3;
+            timelineCtx.beginPath();
+            timelineCtx.moveTo(currentXPos, 20);
+            timelineCtx.lineTo(currentXPos, 70);
+            timelineCtx.stroke();
+            
+            // Marcadores de tempo
+            timelineCtx.strokeStyle = '#333';
+            timelineCtx.lineWidth = 1;
+            timelineCtx.fillStyle = '#333';
+            timelineCtx.font = '10px Arial';
+            timelineCtx.textAlign = 'center';
+            
+            for (let i = 0; i <= totalDuration; i += 5) {
+                const x = startX + (i * scale);
+                timelineCtx.beginPath();
+                timelineCtx.moveTo(x, 65);
+                timelineCtx.lineTo(x, 75);
+                timelineCtx.stroke();
+                timelineCtx.fillText(`${i}s`, x, 85);
+            }
+            
+            // Labels
+            timelineCtx.fillStyle = '#333';
+            timelineCtx.font = 'bold 14px Arial';
+            timelineCtx.textAlign = 'left';
+            timelineCtx.fillText('Ciclo do Semáforo:', 20, 20);
+            timelineCtx.fillText(`Tempo atual: ${Math.floor(currentCycleTime)}s`, 20, 100);
+        }
+        
+        function drawTrafficLight(x, y, lightState, direction) {
+            // Tamanho simplificado para 2 luzes (vermelho e verde)
+            let width, height;
+            
+            if (direction === 'horizontal') {
+                width = 8;
+                height = 20;
+            } else {
+                width = 20;
+                height = 8;
+            }
+            
+            // Caixa do semáforo
+            ctx.fillStyle = '#222';
+            ctx.fillRect(x - width/2, y - height/2, width, height);
+            
+            // Borda
+            ctx.strokeStyle = '#666';
+            ctx.lineWidth = 1;
+            ctx.strokeRect(x - width/2, y - height/2, width, height);
+            
+            // Apenas 2 luzes: vermelho e verde
+            const redColor = lightState === 'red' ? '#FF0000' : '#440000';
+            const greenColor = lightState === 'green' ? '#00FF00' : '#004400';
+            
+            if (direction === 'horizontal') {
+                // Semáforo vertical simplificado (para fluxo horizontal)
+                // Vermelho (topo)
+                ctx.fillStyle = redColor;
+                ctx.beginPath();
+                ctx.arc(x, y - 6, 3.5, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Verde (baixo)
+                ctx.fillStyle = greenColor;
+                ctx.beginPath();
+                ctx.arc(x, y + 6, 3.5, 0, Math.PI * 2);
+                ctx.fill();
+            } else {
+                // Semáforo horizontal simplificado (para fluxo vertical)
+                // Vermelho (esquerda)
+                ctx.fillStyle = redColor;
+                ctx.beginPath();
+                ctx.arc(x - 6, y, 3.5, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Verde (direita)
+                ctx.fillStyle = greenColor;
+                ctx.beginPath();
+                ctx.arc(x + 6, y, 3.5, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+        
+        function drawIntersections() {
+            intersections.forEach((intersection) => {
+                // Zona de segurança (área branca central)
+                ctx.fillStyle = '#FFF';
+                ctx.fillRect(intersection.x - 20, intersection.y - 20, 40, 40);
+                
+                // Borda da zona de segurança
+                ctx.strokeStyle = '#000';
+                ctx.lineWidth = 2;
+                ctx.strokeRect(intersection.x - 20, intersection.y - 20, 40, 40);
+                
+                // Faixas de pedestres
+                ctx.fillStyle = '#FFF';
+                ctx.strokeStyle = '#000';
+                ctx.lineWidth = 1;
+                
+                // Faixas horizontais
+                for (let i = 0; i < 10; i++) {
+                    if (i % 2 === 0) {
+                        ctx.fillRect(intersection.x - 30 + i * 6, intersection.y - 25, 4, 50);
+                    }
+                }
+                
+                // Faixas verticais
+                for (let i = 0; i < 10; i++) {
+                    if (i % 2 === 0) {
+                        ctx.fillRect(intersection.x - 25, intersection.y - 30 + i * 6, 50, 4);
+                    }
+                }
+                
+                // Label da interseção
+                ctx.fillStyle = '#000';
+                ctx.font = 'bold 14px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText(intersection.id, intersection.x, intersection.y + 4);
+                
+                // Determinar estado dos semáforos
+                const activeDirections = stages[currentStage].activeDirections;
+                let nsLight = 'red'; // Norte-Sul
+                let ewLight = 'red'; // Leste-Oeste
+                
+                if (activeDirections.includes('north-south')) {
+                    nsLight = 'green';
+                }
+                if (activeDirections.includes('east-west')) {
+                    ewLight = 'green';
+                }
+                if (activeDirections.includes('left-turns')) {
+                    nsLight = 'green';
+                    ewLight = 'green';
+                }
+                
+                // Semáforos posicionados na pista da direita (padrão brasileiro)
+                
+                // Para fluxo LESTE (indo da esquerda para direita) - na pista inferior (y=210)
+                drawTrafficLight(intersection.x - 25, intersection.y + 12, ewLight, 'horizontal');
+                
+                // Para fluxo OESTE (indo da direita para esquerda) - na pista superior (y=190)
+                drawTrafficLight(intersection.x + 25, intersection.y - 12, ewLight, 'horizontal');
+                
+                // Para fluxo SUL (indo de cima para baixo) - na pista da esquerda (x=140)
+                drawTrafficLight(intersection.x - 12, intersection.y - 25, nsLight, 'vertical');
+                
+                // Para fluxo NORTE (indo de baixo para cima) - na pista da direita (x=160)
+                drawTrafficLight(intersection.x + 12, intersection.y + 25, nsLight, 'vertical');
+            });
+        }
+        
+        function spawnCars() {
+            // Taxa de spawn reduzida conforme solicitado
+            if (Math.random() < 0.03 * simulationSpeed) {
+                const lane = lanes[Math.floor(Math.random() * lanes.length)];
+                
+                // Verificar se há espaço para spawnar
+                let canSpawn = true;
+                for (let car of cars) {
+                    const distance = Math.sqrt(
+                        Math.pow(car.x - lane.startX, 2) + 
+                        Math.pow(car.y - lane.startY, 2)
+                    );
+                    if (distance < 50) {
+                        canSpawn = false;
+                        break;
+                    }
+                }
+                
+                if (canSpawn) {
+                    const newCar = new Car(lane);
+                    cars.push(newCar);
+                }
+            }
+        }
+        
+        function updateSimulation() {
+            stageTimer++;
+            totalTimer++;
+            
+            // Mudança de estágio (apenas 2 estágios)
+            const stageDurationFrames = stages[currentStage].duration * 60 / simulationSpeed;
+            if (stageTimer >= stageDurationFrames) {
+                stageTimer = 0;
+                currentStage = currentStage === 2 ? 1 : currentStage + 1;
+                updatePhaseIndicator();
+            }
+            
+            spawnCars();
+            
+            // Atualizar carros
+            cars.forEach(car => car.update());
+            
+            // Remover carros que saíram completamente da tela (canvas menor)
+            cars = cars.filter(car => 
+                car.x > -100 && car.x < 700 && car.y > -100 && car.y < 500
+            );
+            
+            // Atualizar UI
+            document.getElementById('currentStage').textContent = currentStage;
+            document.getElementById('stageTimer').textContent = Math.floor(stageTimer / 60);
+            document.getElementById('stageDuration').textContent = stages[currentStage].duration;
+            document.getElementById('carsCount').textContent = cars.length;
+            document.getElementById('carsProcessed').textContent = carsProcessed;
+        }
+        
+        function updatePhaseIndicator() {
+            document.querySelectorAll('.phase-dot').forEach((dot, index) => {
+                dot.classList.toggle('active', index + 1 === currentStage);
+            });
+        }
+        
+        function draw() {
+            // Fundo da simulação
+            ctx.fillStyle = '#C0C0C0';
+            ctx.fillRect(0, 0, 600, 400);
+            
+            drawRoads();
+            drawIntersections();
+            
+            // Desenhar carros
+            cars.forEach(car => car.draw());
+            
+            // Informações do estágio
+            ctx.fillStyle = '#000';
+            ctx.font = 'bold 16px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText(`Estágio ${currentStage}: ${stages[currentStage].description}`, 300, 25);
+            
+            ctx.font = '12px Arial';
+            ctx.fillText(`Duração: ${stages[currentStage].duration}s`, 300, 40);
+            
+            // Legenda
+            ctx.textAlign = 'left';
+            ctx.font = '10px Arial';
+            ctx.fillText('🔴 Vermelho | 🟢 Verde | ⚪ Zona Segurança | ⚫ Parado', 20, 380);
+            
+            // Desenhar grafo e timeline
+            drawGraph();
+            drawTimeline();
+        }
+        
+        function gameLoop() {
+            if (isRunning) {
+                updateSimulation();
+            }
+            draw();
+            requestAnimationFrame(gameLoop);
+        }
+        
+        // Event Listeners
+        document.getElementById('startBtn').addEventListener('click', () => {
+            isRunning = true;
+        });
+        
+        document.getElementById('pauseBtn').addEventListener('click', () => {
+            isRunning = false;
+        });
+        
+        document.getElementById('resetBtn').addEventListener('click', () => {
+            isRunning = false;
+            currentStage = 1;
+            stageTimer = 0;
+            totalTimer = 0;
+            carsProcessed = 0;
+            cars = [];
+            carIdCounter = 0;
+            updatePhaseIndicator();
+        });
+        
+        document.getElementById('speedSlider').addEventListener('input', (e) => {
+            simulationSpeed = parseFloat(e.target.value);
+            document.getElementById('speedValue').textContent = simulationSpeed + 'x';
+            
+            // Atualizar velocidade dos carros existentes
+            cars.forEach(car => {
+                car.baseSpeed = (1.2 + Math.random() * 0.8);
+                car.speed = car.baseSpeed * simulationSpeed;
+            });
+        });
+        
+        // Iniciar
+        gameLoop();
+    </script>
+</body>
+</html>

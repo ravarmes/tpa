@@ -1,0 +1,1079 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Remoção em Árvore Binária de Busca - Passo a Passo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .demo-container {
+            display: grid;
+            grid-template-columns: 0.8fr 1fr 1.2fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .tree-panel, .code-panel, .calls-panel {
+            background: white;
+            border-radius: 15px;
+            padding: 15px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            height: 500px;
+            overflow: hidden;
+        }
+
+        .tree-panel h3, .code-panel h3, .calls-panel h3 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+
+        .tree-container {
+            position: relative;
+            height: 430px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            background: #f8f9fa;
+            overflow: hidden;
+        }
+
+        .node {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #3498db;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 12px;
+            transition: all 0.3s ease;
+            z-index: 10;
+            border: 2px solid #2980b9;
+        }
+
+        .node.current {
+            background: #e74c3c;
+            border-color: #c0392b;
+            transform: scale(1.2);
+            box-shadow: 0 0 20px rgba(231, 76, 60, 0.6);
+        }
+
+        .node.comparing {
+            background: #f39c12;
+            border-color: #e67e22;
+            animation: pulse 1s infinite;
+        }
+
+        .node.successor {
+            background: #27ae60;
+            border-color: #229954;
+            transform: scale(1.1);
+            box-shadow: 0 0 15px rgba(39, 174, 96, 0.6);
+        }
+
+        .node.removing {
+            background: #e74c3c;
+            animation: fadeOut 1s ease-out forwards;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+        }
+
+        @keyframes fadeOut {
+            0% { opacity: 1; transform: scale(1); }
+            100% { opacity: 0; transform: scale(0.5); }
+        }
+
+        .edge {
+            position: absolute;
+            height: 2px;
+            background: #34495e;
+            transform-origin: left center;
+            z-index: 5;
+        }
+
+        .code-content {
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            line-height: 1.4;
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 8px;
+            height: 450px;
+            overflow-y: auto;
+            white-space: pre;
+        }
+
+        .code-line {
+            padding: 2px 5px;
+            margin: 1px 0;
+            border-radius: 3px;
+            transition: all 0.3s ease;
+        }
+
+        .code-line.executing {
+            background: #f39c12;
+            color: #2c3e50;
+            font-weight: bold;
+            box-shadow: 0 0 10px rgba(243, 156, 18, 0.5);
+        }
+
+        .calls-content {
+            height: 450px;
+            overflow-y: auto;
+        }
+
+        .calls-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 10px;
+        }
+
+        .calls-table th, .calls-table td {
+            padding: 6px 8px;
+            text-align: left;
+            border-bottom: 1px solid #ecf0f1;
+            word-wrap: break-word;
+        }
+
+        .calls-table th {
+            background: #34495e;
+            color: white;
+            font-weight: bold;
+            position: sticky;
+            top: 0;
+        }
+
+        .calls-table .current-call {
+            background: #fff3cd;
+            font-weight: bold;
+        }
+
+        .calls-table .current-call td {
+            border-left: 3px solid #f39c12;
+        }
+
+        .calls-table .return-value {
+            color: #27ae60;
+            font-weight: bold;
+            font-style: italic;
+        }
+
+        .calls-table .returning-call {
+            background: #ffecb3;
+            animation: fadeOutCall 1.5s ease-in-out;
+        }
+
+        @keyframes fadeOutCall {
+            0% { opacity: 1; background: #fff3cd; }
+            50% { opacity: 1; background: #ffecb3; }
+            100% { opacity: 0.7; background: #ffecb3; }
+        }
+
+        .controls {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        }
+
+        .buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: white;
+            min-width: 180px;
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .btn-case0 { background: linear-gradient(45deg, #e74c3c, #c0392b); }
+        .btn-case1 { background: linear-gradient(45deg, #f39c12, #e67e22); }
+        .btn-case2 { background: linear-gradient(45deg, #27ae60, #229954); }
+        .btn-reset { background: linear-gradient(45deg, #34495e, #2c3e50); }
+
+        .btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .status {
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        .step-counter {
+            font-size: 16px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        .step-description {
+            color: #7f8c8d;
+            font-style: italic;
+            font-size: 14px;
+        }
+
+        /* Responsividade para telas menores */
+        @media (max-width: 1400px) {
+            .demo-container {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto auto auto;
+                gap: 15px;
+            }
+            
+            .tree-panel, .code-panel, .calls-panel {
+                height: 400px;
+            }
+            
+            .tree-container {
+                height: 330px;
+            }
+            
+            .code-content, .calls-content {
+                height: 350px;
+            }
+        }
+
+        @media (min-width: 1401px) {
+            .calls-panel h3 {
+                font-size: 15px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .btn {
+                width: 100%;
+                max-width: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌳 Remoção em Árvore Binária de Busca - Primeira Chamada Completa</h1>
+        
+        <div class="demo-container">
+            <div class="tree-panel">
+                <h3>🌳 Árvore Binária de Busca</h3>
+                <div class="tree-container" id="treeContainer"></div>
+            </div>
+            <div class="code-panel">
+                <h3>💻 Código da Função remove()</h3>
+                <div class="code-content" id="codeContent"></div>
+            </div>
+            <div class="calls-panel">
+                <h3>📚 Pilha de Chamadas Recursivas</h3>
+                <div class="calls-content">
+                    <table class="calls-table">
+                        <thead>
+                            <tr>
+                                <th>Chamada</th>
+                                <th>Instrução</th>
+                                <th>Resultado</th>
+                            </tr>
+                        </thead>
+                        <tbody id="callsTableBody">
+                            <tr>
+                                <td colspan="3" style="text-align: center; color: #7f8c8d; font-style: italic;">
+                                    Aguardando demonstração...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <div class="buttons">
+                <button class="btn btn-case0" onclick="demonstrarCaso0()" id="btnCaso0">
+                    Caso 0: Remove C (0 filhos)
+                </button>
+                <button class="btn btn-case1" onclick="demonstrarCaso1()" id="btnCaso1">
+                    Caso 1: Remove R (1 filho)
+                </button>
+                <button class="btn btn-case2" onclick="demonstrarCaso2()" id="btnCaso2">
+                    Caso 2: Remove E (2 filhos)
+                </button>
+                <button class="btn btn-reset" onclick="resetarArvore()" id="btnReset">
+                    🔄 Resetar Árvore
+                </button>
+            </div>
+            <div class="status">
+                <div class="step-counter" id="stepCounter">Selecione um caso para iniciar</div>
+                <div class="step-description" id="stepDescription">Demonstração foca na finalização completa da primeira chamada recursiva</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let arvore = null;
+        let animationInProgress = false;
+        let currentStep = 0;
+        let recursiveCalls = [];
+
+        const removeCode = [
+            "No remove(No x, String valor) {",
+            "    if (x == null) return null;",
+            "    int cmp = valor.compareTo(x.valor);",
+            "    if (cmp < 0)",
+            "        x.esquerda = remove(x.esquerda, valor);",
+            "    else if (cmp > 0)",
+            "        x.direita = remove(x.direita, valor);",
+            "    else {",
+            "        if (x.direita == null) return x.esquerda;",
+            "        if (x.esquerda == null) return x.direita;",
+            "        No t = x;",
+            "        x = min(t.direita);",
+            "        x.direita = removeMin(t.direita);",
+            "        x.esquerda = t.esquerda;",
+            "    }",
+            "    return x;",
+            "}"
+        ];
+
+        // Ordem customizada para a BST do PDF: C < E < S < X < A < R < M < H
+        const valorOrdem = {
+            'C': 1,
+            'E': 2,
+            'S': 3,
+            'X': 4,
+            'A': 5,
+            'R': 6,
+            'M': 7,
+            'H': 8
+        };
+
+        function compararValores(valor1, valor2) {
+            const ordem1 = valorOrdem[valor1];
+            const ordem2 = valorOrdem[valor2];
+            return ordem1 - ordem2; // < 0 se valor1 < valor2, > 0 se valor1 > valor2, 0 se iguais
+        }
+
+        class No {
+            constructor(valor, x = 0, y = 0) {
+                this.value = valor;
+                this.left = null;
+                this.right = null;
+                this.x = x;
+                this.y = y;
+                this.element = null;
+            }
+        }
+
+        function criarArvoreInicial() {
+            // Estrutura exata do PDF - ajustada para o novo tamanho
+            arvore = new No('A', 180, 40);
+            arvore.left = new No('E', 110, 100);
+            arvore.right = new No('R', 250, 100);
+            
+            arvore.left.left = new No('C', 55, 160);
+            arvore.left.right = new No('S', 165, 160);
+            arvore.right.right = new No('H', 305, 160);
+            
+            arvore.left.right.right = new No('X', 195, 220);
+            arvore.right.right.left = new No('M', 275, 220);
+        }
+
+        function renderizarArvore() {
+            const container = document.getElementById('treeContainer');
+            container.innerHTML = '';
+            
+            if (arvore) {
+                renderizarArestas(arvore, container);
+                renderizarNos(arvore, container);
+            }
+        }
+
+        function renderizarNos(node, container) {
+            if (!node) return;
+
+            const nodeElement = document.createElement('div');
+            nodeElement.className = 'node';
+            nodeElement.textContent = node.value;
+            nodeElement.style.left = (node.x - 15) + 'px';
+            nodeElement.style.top = node.y + 'px';
+            
+            node.element = nodeElement;
+            container.appendChild(nodeElement);
+
+            renderizarNos(node.left, container);
+            renderizarNos(node.right, container);
+        }
+
+        function renderizarArestas(node, container) {
+            if (!node) return;
+
+            if (node.left) {
+                criarAresta(node, node.left, container);
+                renderizarArestas(node.left, container);
+            }
+
+            if (node.right) {
+                criarAresta(node, node.right, container);
+                renderizarArestas(node.right, container);
+            }
+        }
+
+        function criarAresta(parent, child, container) {
+            const edge = document.createElement('div');
+            edge.className = 'edge';
+            
+            const dx = child.x - parent.x;
+            const dy = child.y - parent.y;
+            const length = Math.sqrt(dx * dx + dy * dy);
+            const angle = Math.atan2(dy, dx) * 180 / Math.PI;
+            
+            edge.style.left = parent.x + 'px';
+            edge.style.top = (parent.y + 15) + 'px';
+            edge.style.width = length + 'px';
+            edge.style.transform = `rotate(${angle}deg)`;
+            
+            container.appendChild(edge);
+        }
+
+        function encontrarNo(node, value) {
+            if (!node || node.value === value) return node;
+            if (compararValores(value, node.value) < 0) return encontrarNo(node.left, value);
+            return encontrarNo(node.right, value);
+        }
+
+        function encontrarPai(node, value, pai = null) {
+            if (!node) return null;
+            if (node.value === value) return pai;
+            if (compararValores(value, node.value) < 0) return encontrarPai(node.left, value, node);
+            return encontrarPai(node.right, value, node);
+        }
+
+        function mostrarCodigo() {
+            const codeContent = document.getElementById('codeContent');
+            codeContent.innerHTML = removeCode.map((line, index) => 
+                `<div class="code-line" id="line${index}">${line}</div>`
+            ).join('');
+        }
+
+        function destacarLinha(lineNumber) {
+            // Remove destaque anterior
+            document.querySelectorAll('.code-line').forEach(line => {
+                line.classList.remove('executing');
+            });
+            
+            // Adiciona novo destaque
+            const line = document.getElementById(`line${lineNumber}`);
+            if (line) {
+                line.classList.add('executing');
+                line.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+
+        function limparDestaques() {
+            document.querySelectorAll('.node').forEach(node => {
+                node.classList.remove('current', 'comparing', 'successor', 'removing');
+            });
+        }
+
+        function adicionarChamadaRecursiva(chamada, instrucao, resultado = '') {
+            // Adiciona no final da array para simular pilha real (LIFO)
+            recursiveCalls.push({ chamada, instrucao, resultado });
+            atualizarTabelaChamadas();
+        }
+
+        async function removerChamadaRecursiva(valorRetorno = '') {
+            console.log("🔍 DEBUG removerChamadaRecursiva: Pilha antes:", recursiveCalls.length, "chamadas");
+            
+            // Remove a última chamada da pilha (LIFO) e atualiza a anterior com o retorno
+            if (recursiveCalls.length > 0) {
+                // Primeiro mostra que a chamada atual está retornando
+                const chamadaAtual = recursiveCalls[recursiveCalls.length - 1];
+                const nomeCallAtual = chamadaAtual.chamada;
+                console.log("🔍 DEBUG: Processando retorno de:", nomeCallAtual);
+                
+                chamadaAtual.resultado = `⬆️ RETORNANDO: ${valorRetorno}`;
+                atualizarTabelaChamadas();
+                await sleep(1200); // Pausa para mostrar o retorno
+                
+                // Remove a chamada da pilha
+                const chamadaRemovida = recursiveCalls.pop();
+                console.log("🔍 DEBUG: Chamada removida:", chamadaRemovida.chamada, "- Pilha agora tem:", recursiveCalls.length);
+                
+                // SEMPRE atualiza a tabela após remover para mostrar que a chamada foi removida
+                atualizarTabelaChamadas();
+                await sleep(600); // Pausa para mostrar remoção
+                
+                // Se ainda há chamadas na pilha, atualiza a anterior com o valor de retorno
+                if (recursiveCalls.length > 0 && valorRetorno !== '') {
+                    const chamadaAnterior = recursiveCalls[recursiveCalls.length - 1];
+                    console.log("🔍 DEBUG: Atualizando chamada anterior:", chamadaAnterior.chamada);
+                    chamadaAnterior.resultado = `⬇️ recebeu: ${valorRetorno}`;
+                    atualizarTabelaChamadas();
+                    await sleep(800); // Pausa para mostrar recebimento
+                }
+                
+                // Verificação especial para pilha vazia APÓS todas as operações
+                if (recursiveCalls.length === 0) {
+                    console.log("🔍 DEBUG: Pilha está vazia - mostrando mensagem final");
+                    await sleep(500);
+                    const tbody = document.getElementById('callsTableBody');
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="3" style="text-align: center; color: #27ae60; font-weight: bold; font-style: italic; background: #d4edda; padding: 15px; font-size: 12px;">
+                                🎯 PRIMEIRA CHAMADA FINALIZADA!<br/>
+                                Pilha completamente desempilhada. O valor retornado (${valorRetorno}) está disponível para uso.
+                            </td>
+                        </tr>
+                    `;
+                }
+                
+                return chamadaRemovida;
+            }
+            return null;
+        }
+
+        function atualizarTabelaChamadas() {
+            const tbody = document.getElementById('callsTableBody');
+            console.log("🔍 DEBUG atualizarTabelaChamadas: Pilha tem", recursiveCalls.length, "chamadas");
+            
+            if (recursiveCalls.length === 0) {
+                console.log("🔍 DEBUG: Mostrando mensagem de pilha vazia");
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="3" style="text-align: center; color: #7f8c8d; font-style: italic;">
+                            Pilha vazia - todas as chamadas foram finalizadas
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            // Inverte a ordem para mostrar as últimas chamadas no topo (como pilha)
+            const reversedCalls = [...recursiveCalls].reverse();
+            console.log("🔍 DEBUG: Renderizando", reversedCalls.length, "chamadas na tabela");
+            
+            tbody.innerHTML = reversedCalls.map((call, index) => {
+                const isReturnValue = call.resultado.startsWith('⬇️ recebeu:');
+                const isReturning = call.resultado.startsWith('⬆️ RETORNANDO:');
+                let resultClass = '';
+                let rowClass = index === 0 ? 'current-call' : '';
+                
+                if (isReturnValue) {
+                    resultClass = 'return-value';
+                } else if (isReturning) {
+                    resultClass = 'return-value';
+                    rowClass += ' returning-call';
+                }
+                
+                return `<tr class="${rowClass}">
+                    <td style="font-size: 9px;">${call.chamada}</td>
+                    <td style="font-size: 9px;">${call.instrucao}</td>
+                    <td style="font-size: 9px;" class="${resultClass}">${call.resultado}</td>
+                </tr>`;
+            }).join('');
+            
+            // Scroll para o topo para mostrar a chamada mais recente
+            const callsContent = document.querySelector('.calls-content');
+            if (callsContent) {
+                callsContent.scrollTop = 0;
+            }
+        }
+
+        function atualizarPasso(titulo, descricao) {
+            currentStep++;
+            document.getElementById('stepCounter').textContent = `Passo ${currentStep}: ${titulo}`;
+            document.getElementById('stepDescription').textContent = descricao;
+        }
+
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        function desabilitarBotoes() {
+            ['btnCaso0', 'btnCaso1', 'btnCaso2'].forEach(id => {
+                document.getElementById(id).disabled = true;
+            });
+        }
+
+        function habilitarBotoes() {
+            ['btnCaso0', 'btnCaso1', 'btnCaso2'].forEach(id => {
+                document.getElementById(id).disabled = false;
+            });
+        }
+
+        async function demonstrarCaso0() {
+            if (animationInProgress) return;
+            
+            animationInProgress = true;
+            desabilitarBotoes();
+            currentStep = 0;
+            recursiveCalls = [];
+
+            try {
+                resetarArvore();
+                mostrarCodigo();
+                await sleep(500);
+
+                atualizarPasso("Iniciando remoção", "Removendo nó C (0 filhos) - nó folha");
+
+                // Passo 1: Chamada inicial
+                destacarLinha(0);
+                adicionarChamadaRecursiva('remove(raiz, "C")', 'No remove(No x, String valor)', 'Iniciando remoção de C');
+                await sleep(1500);
+
+                // Passo 2: Primeira comparação na raiz A
+                destacarLinha(1);
+                const nodeA = encontrarNo(arvore, 'A');
+                limparDestaques();
+                nodeA.element.classList.add('comparing');
+                adicionarChamadaRecursiva('remove(A, "C")', 'if (x == null) return null;', 'x ≠ null, continua');
+                atualizarPasso("Verificação nula", "Verificando se nó atual é null: A ≠ null");
+                await sleep(1500);
+
+                // Passo 3: Comparação de valores
+                destacarLinha(2);
+                const cmp = compararValores('C', 'A'); // C=1, A=5, então C < A
+                adicionarChamadaRecursiva('remove(A, "C")', 'int cmp = valor.compareTo(x.valor);', `cmp = ${cmp} (C < A)`);
+                atualizarPasso("Comparação de valores", "Comparando 'C' com 'A': C < A na ordem da BST");
+                await sleep(1500);
+
+                // Passo 4: C < A, vai para esquerda
+                destacarLinha(3);
+                limparDestaques();
+                nodeA.element.classList.add('current');
+                adicionarChamadaRecursiva('remove(A, "C")', 'if (cmp < 0)', 'cmp < 0, vai para esquerda');
+                atualizarPasso("Decisão de navegação", "C < A, navegar para subárvore esquerda");
+                await sleep(1500);
+
+                // Passo 5: Ir para esquerda (E)
+                destacarLinha(4);
+                limparDestaques();
+                const nodeE = encontrarNo(arvore, 'E');
+                nodeE.element.classList.add('comparing');
+                adicionarChamadaRecursiva('remove(A, "C")', 'x.esquerda = remove(x.esquerda, valor);', 'chama remove(E, "C")');
+                atualizarPasso("Navegação à esquerda", "Chamando remove recursivamente na subárvore esquerda (E)");
+                await sleep(1500);
+
+                // Passo 6: Comparação em E
+                destacarLinha(2);
+                const cmpE = compararValores('C', 'E'); // C=1, E=2, então C < E
+                adicionarChamadaRecursiva('remove(E, "C")', 'int cmp = valor.compareTo(x.valor);', `cmp = ${cmpE} (C < E)`);
+                atualizarPasso("Comparação em E", "Comparando 'C' com 'E': C < E");
+                await sleep(1500);
+
+                // Passo 7: Ir para esquerda de E (C)
+                destacarLinha(4);
+                limparDestaques();
+                const nodeC = encontrarNo(arvore, 'C');
+                nodeC.element.classList.add('current');
+                adicionarChamadaRecursiva('remove(E, "C")', 'x.esquerda = remove(x.esquerda, valor);', 'chama remove(C, "C")');
+                atualizarPasso("Navegação à esquerda", "C < E, navegando para subárvore esquerda (C)");
+                await sleep(1500);
+
+                // Passo 8: Encontrou o nó (C == C)
+                destacarLinha(2);
+                adicionarChamadaRecursiva('remove(C, "C")', 'int cmp = valor.compareTo(x.valor);', 'cmp = 0, encontrou o nó');
+                await sleep(1500);
+
+                destacarLinha(7);
+                adicionarChamadaRecursiva('remove(C, "C")', 'else {', 'cmp == 0, entrando no bloco de remoção');
+                atualizarPasso("Nó encontrado", "Encontrou o nó C a ser removido");
+                await sleep(1500);
+
+                // Passo 9: C não tem filho direito
+                destacarLinha(8);
+                adicionarChamadaRecursiva('remove(C, "C")', 'if (x.direita == null) return x.esquerda;', 'C.direita == null, retorna C.esquerda (null)');
+                atualizarPasso("Verificação filhos", "C não tem filho direito, retorna filho esquerdo (null)");
+                await sleep(1500);
+
+                // Passo 10: Remover o nó visualmente
+                nodeC.element.classList.remove('current');
+                nodeC.element.classList.add('removing');
+                atualizarPasso("Remoção", "Nó C removido da árvore");
+                await sleep(1000);
+
+                // ========== INÍCIO DO RETORNO DAS CHAMADAS ==========
+                atualizarPasso("Desempilhando", "Início do retorno das chamadas recursivas...");
+                console.log("🔍 DEBUG: Iniciando desempilhamento. Pilha tem", recursiveCalls.length, "chamadas");
+                await sleep(1000);
+
+                // Retorno da chamada remove(C, "C") → null
+                destacarLinha(17); // return x;
+                console.log("🔍 DEBUG: Antes de remover C - Pilha tem", recursiveCalls.length, "chamadas");
+                await removerChamadaRecursiva('null');
+                console.log("🔍 DEBUG: Após remover C - Pilha tem", recursiveCalls.length, "chamadas");
+                atualizarPasso("Retorno 1", "remove(C, \"C\") FINALIZADA! Removida da pilha, retorna null");
+                await sleep(1500);
+
+                // Retorno da chamada remove(E, "C") → E atualizado
+                destacarLinha(17); // return x;
+                console.log("🔍 DEBUG: Antes de remover E - Pilha tem", recursiveCalls.length, "chamadas");
+                await removerChamadaRecursiva('E (sem C)');
+                console.log("🔍 DEBUG: Após remover E - Pilha tem", recursiveCalls.length, "chamadas");
+                atualizarPasso("Retorno 2", "remove(E, \"C\") FINALIZADA! Removida da pilha, retorna E modificado");
+                await sleep(1500);
+
+                // Retorno da chamada remove(A, "C") → A atualizado
+                destacarLinha(17); // return x;
+                console.log("🔍 DEBUG: Antes de remover A - Pilha tem", recursiveCalls.length, "chamadas");
+                await removerChamadaRecursiva('A (com E modificado)');
+                console.log("🔍 DEBUG: Após remover A - Pilha tem", recursiveCalls.length, "chamadas");
+                atualizarPasso("Retorno 3", "remove(A, \"C\") FINALIZADA! Removida da pilha, retorna A modificado");
+                await sleep(1500);
+
+                // Retorno da chamada inicial remove(raiz, "C")
+                // Esta é a primeira chamada que termina!
+                console.log("🔍 DEBUG: Antes de remover raiz - Pilha tem", recursiveCalls.length, "chamadas");
+                await removerChamadaRecursiva('raiz modificada');
+                console.log("🔍 DEBUG: Após remover raiz - Pilha tem", recursiveCalls.length, "chamadas");
+                atualizarPasso("Primeira chamada concluída!", "remove(raiz, \"C\") FINALIZADA! Pilha completamente vazia");
+                await sleep(2000);
+
+                // Atualizar estrutura da árvore
+                arvore.left.left = null;
+                renderizarArvore();
+                
+                atualizarPasso("Concluído", "✅ PRIMEIRA CHAMADA FINALIZADA! A pilha foi completamente desempilhada e o valor retornado (nova raiz) pode ser usado.");
+
+            } catch (error) {
+                console.error('Erro na demonstração caso 0:', error);
+                atualizarPasso("Erro", "Ocorreu um erro durante a demonstração: " + error.message);
+            } finally {
+                animationInProgress = false;
+                habilitarBotoes();
+            }
+        }
+
+        async function demonstrarCaso1() {
+            if (animationInProgress) return;
+            
+            animationInProgress = true;
+            desabilitarBotoes();
+            currentStep = 0;
+            recursiveCalls = [];
+
+            try {
+                resetarArvore();
+                mostrarCodigo();
+                await sleep(500);
+
+                atualizarPasso("Iniciando remoção", "Removendo nó R (1 filho) - tem apenas filho direito H");
+
+                // Navegar até R
+                destacarLinha(0);
+                adicionarChamadaRecursiva('remove(raiz, "R")', 'No remove(No x, String valor)', 'Iniciando remoção de R');
+                await sleep(1000);
+
+                // Verificação em A
+                destacarLinha(1);
+                const nodeA = encontrarNo(arvore, 'A');
+                limparDestaques();
+                nodeA.element.classList.add('comparing');
+                adicionarChamadaRecursiva('remove(A, "R")', 'if (x == null) return null;', 'x ≠ null, continua');
+                await sleep(1000);
+
+                // Comparação A vs R
+                destacarLinha(2);
+                const cmp = compararValores('R', 'A'); // R=6, A=5, então R > A
+                adicionarChamadaRecursiva('remove(A, "R")', 'int cmp = valor.compareTo(x.valor);', `cmp = ${cmp} (R > A)`);
+                atualizarPasso("Comparação na raiz", "R > A na ordem da BST, vai para direita");
+                await sleep(1500);
+
+                // Ir para direita
+                destacarLinha(5);
+                destacarLinha(6);
+                limparDestaques();
+                const nodeR = encontrarNo(arvore, 'R');
+                nodeR.element.classList.add('current');
+                adicionarChamadaRecursiva('remove(A, "R")', 'x.direita = remove(x.direita, valor);', 'chama remove(R, "R")');
+                await sleep(1500);
+
+                // Encontrou R
+                destacarLinha(2);
+                adicionarChamadaRecursiva('remove(R, "R")', 'int cmp = valor.compareTo(x.valor);', 'cmp = 0, encontrou o nó R');
+                await sleep(1000);
+
+                destacarLinha(7);
+                adicionarChamadaRecursiva('remove(R, "R")', 'else {', 'cmp == 0, entrando no bloco de remoção');
+                atualizarPasso("Nó encontrado", "Encontrou o nó R a ser removido");
+                await sleep(1500);
+
+                // R não tem filho esquerdo
+                destacarLinha(9);
+                const nodeH = encontrarNo(arvore, 'H');
+                nodeH.element.classList.add('successor');
+                adicionarChamadaRecursiva('remove(R, "R")', 'if (x.esquerda == null) return x.direita;', 'R.esquerda == null, retorna R.direita (H)');
+                atualizarPasso("Verificação dos filhos", "R não tem filho esquerdo, retorna filho direito H");
+                await sleep(1500);
+
+                // Substituir R por H
+                nodeR.element.classList.add('removing');
+                atualizarPasso("Substituição", "R foi substituído por seu filho H");
+                await sleep(1000);
+
+                // ========== INÍCIO DO RETORNO DAS CHAMADAS ==========
+                atualizarPasso("Desempilhando", "Início do retorno das chamadas recursivas...");
+                await sleep(1000);
+
+                // Retorno da chamada remove(R, "R") → H
+                destacarLinha(17); // return x;
+                await removerChamadaRecursiva('H');
+                atualizarPasso("Retorno 1", "remove(R, \"R\") FINALIZADA! Removida da pilha, retorna H");
+                await sleep(1500);
+
+                // Retorno da chamada remove(A, "R") → A atualizado
+                destacarLinha(17); // return x;
+                await removerChamadaRecursiva('A (com H no lugar de R)');
+                atualizarPasso("Retorno 2", "remove(A, \"R\") FINALIZADA! Removida da pilha, retorna A modificado");
+                await sleep(1500);
+
+                // Retorno da chamada inicial remove(raiz, "R")
+                // Esta é a primeira chamada que termina!
+                atualizarPasso("Primeira chamada concluída!", "remove(raiz, \"R\") FINALIZADA! Pilha completamente vazia");
+                await sleep(2000);
+
+                // Atualizar estrutura
+                arvore.right = arvore.right.right; // H assume lugar de R
+                renderizarArvore();
+                
+                atualizarPasso("Concluído", "✅ PRIMEIRA CHAMADA FINALIZADA! A pilha foi completamente desempilhada e o valor retornado (nova raiz) pode ser usado.");
+
+            } catch (error) {
+                console.error('Erro na demonstração caso 1:', error);
+                atualizarPasso("Erro", "Ocorreu um erro durante a demonstração: " + error.message);
+            } finally {
+                animationInProgress = false;
+                habilitarBotoes();
+            }
+        }
+
+        async function demonstrarCaso2() {
+            if (animationInProgress) return;
+            
+            animationInProgress = true;
+            desabilitarBotoes();
+            currentStep = 0;
+            recursiveCalls = [];
+
+            try {
+                resetarArvore();
+                mostrarCodigo();
+                await sleep(500);
+
+                atualizarPasso("Iniciando remoção", "Removendo nó E (2 filhos) - tem filhos C e S");
+
+                // Navegar até E
+                destacarLinha(0);
+                adicionarChamadaRecursiva('remove(raiz, "E")', 'No remove(No x, String valor)', 'Iniciando remoção de E');
+                await sleep(1000);
+
+                // Verificação em A
+                destacarLinha(1);
+                const nodeA = encontrarNo(arvore, 'A');
+                limparDestaques();
+                nodeA.element.classList.add('comparing');
+                adicionarChamadaRecursiva('remove(A, "E")', 'if (x == null) return null;', 'x ≠ null, continua');
+                await sleep(1000);
+
+                // Comparação A vs E
+                destacarLinha(2);
+                const cmp = compararValores('E', 'A'); // E=2, A=5, então E < A
+                adicionarChamadaRecursiva('remove(A, "E")', 'int cmp = valor.compareTo(x.valor);', `cmp = ${cmp} (E < A)`);
+                await sleep(1000);
+
+                // E < A, vai para esquerda
+                destacarLinha(3);
+                limparDestaques();
+                const nodeE = encontrarNo(arvore, 'E');
+                nodeE.element.classList.add('current');
+                adicionarChamadaRecursiva('remove(A, "E")', 'if (cmp < 0)', 'E < A, vai para esquerda');
+                atualizarPasso("Navegação", "E < A na ordem da BST, navega para esquerda");
+                await sleep(1500);
+
+                destacarLinha(4);
+                adicionarChamadaRecursiva('remove(A, "E")', 'x.esquerda = remove(x.esquerda, valor);', 'chama remove(E, "E")');
+                await sleep(1500);
+
+                // Encontrou E
+                destacarLinha(2);
+                adicionarChamadaRecursiva('remove(E, "E")', 'int cmp = valor.compareTo(x.valor);', 'cmp = 0, encontrou o nó E');
+                await sleep(1000);
+
+                destacarLinha(7);
+                adicionarChamadaRecursiva('remove(E, "E")', 'else {', 'cmp == 0, entrando no bloco de remoção');
+                atualizarPasso("Nó encontrado", "Encontrou o nó E com dois filhos");
+                await sleep(1500);
+
+                // E tem dois filhos (não entra nas condições das linhas 8 e 9)
+                destacarLinha(8);
+                adicionarChamadaRecursiva('remove(E, "E")', 'if (x.direita == null)', 'E.direita ≠ null (S existe)');
+                await sleep(1000);
+
+                destacarLinha(9);
+                adicionarChamadaRecursiva('remove(E, "E")', 'if (x.esquerda == null)', 'E.esquerda ≠ null (C existe)');
+                await sleep(1000);
+
+                // Caso dos dois filhos
+                destacarLinha(10);
+                adicionarChamadaRecursiva('remove(E, "E")', 'No t = x;', 'salva referência do nó E');
+                atualizarPasso("Salvando referência", "Salva referência do nó E que será removido");
+                await sleep(1500);
+
+                // Encontrar sucessor (mínimo da subárvore direita)
+                destacarLinha(11);
+                const nodeS = encontrarNo(arvore, 'S');
+                nodeS.element.classList.add('successor');
+                adicionarChamadaRecursiva('remove(E, "E")', 'x = min(t.direita);', 'encontra mínimo da subárvore direita: S');
+                atualizarPasso("Encontrando sucessor", "Encontra o sucessor in-order: S (mínimo da subárvore direita)");
+                await sleep(1500);
+
+                // Remover o sucessor da sua posição original
+                destacarLinha(12);
+                adicionarChamadaRecursiva('remove(E, "E")', 'x.direita = removeMin(t.direita);', 'remove S da sua posição original');
+                atualizarPasso("Removendo sucessor", "Remove S da sua posição original, X fica no lugar de S");
+                await sleep(1500);
+
+                // Conectar filho esquerdo
+                destacarLinha(13);
+                adicionarChamadaRecursiva('remove(E, "E")', 'x.esquerda = t.esquerda;', 'conecta C como filho esquerdo de S');
+                atualizarPasso("Reconectando", "Conecta o filho esquerdo original (C) ao sucessor S");
+                await sleep(1500);
+
+                // Fazer a substituição na estrutura
+                arvore.left.value = 'S'; // E vira S
+                arvore.left.right = arvore.left.right.right; // X substitui S na posição original
+                
+                renderizarArvore();
+                
+                // Destacar o novo S
+                const novoS = encontrarNo(arvore, 'S');
+                if (novoS) novoS.element.classList.add('successor');
+
+                atualizarPasso("Substituição completa", "E foi substituído por S, mantendo a propriedade da BST");
+                await sleep(1000);
+
+                // ========== INÍCIO DO RETORNO DAS CHAMADAS ==========
+                atualizarPasso("Desempilhando", "Início do retorno das chamadas recursivas...");
+                await sleep(1000);
+
+                // Retorno da chamada remove(E, "E") → S (novo nó)
+                destacarLinha(17); // return x;
+                await removerChamadaRecursiva('S (novo nó)');
+                atualizarPasso("Retorno 1", "remove(E, \"E\") FINALIZADA! Removida da pilha, retorna S");
+                await sleep(1500);
+
+                // Retorno da chamada remove(A, "E") → A atualizado
+                destacarLinha(17); // return x;
+                await removerChamadaRecursiva('A (com S no lugar de E)');
+                atualizarPasso("Retorno 2", "remove(A, \"E\") FINALIZADA! Removida da pilha, retorna A modificado");
+                await sleep(1500);
+
+                // Retorno da chamada inicial remove(raiz, "E")
+                // Esta é a primeira chamada que termina!
+                atualizarPasso("Primeira chamada concluída!", "remove(raiz, \"E\") FINALIZADA! Pilha completamente vazia");
+                await sleep(2000);
+
+                atualizarPasso("Concluído", "✅ PRIMEIRA CHAMADA FINALIZADA! A pilha foi completamente desempilhada e o valor retornado (nova raiz) pode ser usado.");
+
+            } catch (error) {
+                console.error('Erro na demonstração caso 2:', error);
+                atualizarPasso("Erro", "Ocorreu um erro durante a demonstração: " + error.message);
+            } finally {
+                animationInProgress = false;
+                habilitarBotoes();
+            }
+        }
+
+        function resetarArvore() {
+            // Para a animação se estiver em progresso
+            animationInProgress = false;
+            
+            // Recria a árvore inicial
+            criarArvoreInicial();
+            renderizarArvore();
+            mostrarCodigo();
+            
+            // Limpa todos os estados
+            currentStep = 0;
+            recursiveCalls = [];
+            document.getElementById('callsTableBody').innerHTML = `
+                <tr>
+                    <td colspan="3" style="text-align: center; color: #7f8c8d; font-style: italic;">
+                        Aguardando demonstração...
+                    </td>
+                </tr>
+            `;
+            document.getElementById('stepCounter').textContent = 'Árvore Resetada';
+            document.getElementById('stepDescription').textContent = 'Árvore resetada. Demonstração mostra a finalização completa da primeira chamada.';
+            
+            // Remove todos os destaques
+            document.querySelectorAll('.code-line').forEach(line => {
+                line.classList.remove('executing');
+            });
+            
+            limparDestaques();
+            habilitarBotoes();
+        }
+
+        // Inicializar quando a página carregar
+        window.onload = function() {
+            resetarArvore();
+        };
+    </script>
+</body>
+</html> 
