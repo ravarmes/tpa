@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TPA - Teoria e Prática de Algoritmos</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            color: #7f8c8d;
+            font-weight: 300;
+        }
+
+        .categories {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .category {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .category:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .category-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .category-icon {
+            font-size: 2.5rem;
+            margin-right: 15px;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .category h2 {
+            color: #2c3e50;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .examples {
+            list-style: none;
+        }
+
+        .examples li {
+            margin-bottom: 12px;
+        }
+
+        .examples a {
+            display: block;
+            padding: 15px 20px;
+            background: white;
+            color: #2c3e50;
+            text-decoration: none;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .examples a:hover {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            transform: translateX(5px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 50px;
+            padding-top: 30px;
+            border-top: 2px solid #e9ecef;
+            color: #7f8c8d;
+        }
+
+        .footer p {
+            font-size: 1rem;
+            margin-bottom: 10px;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 20px;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .content-section {
+            margin-bottom: 50px;
+        }
+
+        .image-section {
+            display: flex;
+            align-items: center;
+            margin-bottom: 40px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        }
+
+        .image-section:nth-child(even) {
+            flex-direction: row-reverse;
+        }
+
+        .content-image {
+            width: 300px;
+            height: 200px;
+            object-fit: contain;
+            border-radius: 10px;
+            margin: 0 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .dual-image-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        }
+
+        .dual-image-item {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            margin: 0 10px;
+        }
+
+        .dual-image-item .image-text {
+             flex: 1;
+             margin-right: 20px;
+         }
+
+        .dual-image-item .content-image {
+            margin: 0;
+        }
+
+        .image-text {
+            flex: 1;
+        }
+
+        .image-text h3 {
+            color: #2c3e50;
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .image-text p {
+            color: #555;
+            line-height: 1.6;
+            font-size: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+                margin: 10px;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .categories {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .stats {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .image-section {
+                flex-direction: column !important;
+                text-align: center;
+            }
+
+            .content-image {
+                width: 250px;
+                height: 150px;
+                margin: 0 0 15px 0;
+            }
+
+            .dual-image-section {
+                flex-direction: column;
+            }
+
+            .dual-image-item {
+                flex-direction: column;
+                text-align: center;
+                margin: 20px 0;
+            }
+
+            .dual-image-item .image-text {
+                 margin-right: 0;
+                 margin-bottom: 15px;
+             }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Técnicas de Programação Avançadas</h1>
+            <p>Exemplos interativos de estruturas de dados e algoritmos</p>
+        </div>
+
+        <!-- Seção de Imagens e Conteúdo -->
+        <div class="content-section">
+            <div class="image-section">
+                <img src="assets/algoritmos.png" alt="Algoritmos" class="content-image">
+                <div class="image-text">
+                    <h3>A Importância dos Algoritmos</h3>
+                    <p>Os algoritmos são a base fundamental da ciência da computação e programação. Eles representam sequências lógicas de passos para resolver problemas computacionais de forma eficiente. O domínio de algoritmos permite desenvolver soluções otimizadas, compreender a complexidade computacional e criar software robusto e escalável. Infelizmente, muitos desenvolvedores negligenciam esses conceitos fundamentais, focando apenas em frameworks e tecnologias da moda, sem compreender os princípios que tornam o código verdadeiramente eficiente.</p>
+                </div>
+            </div>
+
+            <div class="dual-image-section">
+                <div class="dual-image-item">
+                    <div class="image-text">
+                        <h3>Conteúdo do Repositório TPA</h3>
+                        <p>Este repositório abrange os principais tópicos de Técnicas de Programação Avançadas, incluindo estruturas de dados fundamentais, algoritmos de grafos, análise de complexidade e técnicas de otimização.</p>
+                    </div>
+                    <img src="assets/mapa_mental_tpa.png" alt="Mapa Mental TPA" class="content-image">
+                </div>
+                <div class="dual-image-item">
+                    <div class="image-text">
+                        <h3>Teoria dos Grafos</h3>
+                        <p>A teoria dos grafos estuda estruturas matemáticas para modelar relações entre objetos. Aplicações incluem redes sociais, sistemas de transporte, algoritmos de busca e muito mais.</p>
+                    </div>
+                    <img src="assets/mapa_mental_grafos.png" alt="Mapa Mental Grafos" class="content-image">
+                </div>
+            </div>
+        </div>
+
+        <div class="categories">
+            <!-- Análise de Algoritmos -->
+            <div class="category">
+                <div class="category-header">
+                    <div class="category-icon">📊</div>
+                    <h2>Análise de Algoritmos</h2>
+                </div>
+                <ul class="examples">
+                    <li><a href="analise_algoritmos_trabalho01.html">Trabalho 01 - Análise de Algoritmos</a></li>
+                    <li><a href="analise_algoritmos_loops.html">Análise de Loops Aninhados</a></li>
+                </ul>
+            </div>
+
+            <!-- Árvore Binária de Busca -->
+            <div class="category">
+                <div class="category-header">
+                    <div class="category-icon">🌳</div>
+                    <h2>Árvore Binária de Busca</h2>
+                </div>
+                <ul class="examples">
+                    <li><a href="bst_remocao.html">Remoção em BST - Passo a Passo</a></li>
+                </ul>
+            </div>
+
+            <!-- Tabela Hash -->
+            <div class="category">
+                <div class="category-header">
+                    <div class="category-icon">#️⃣</div>
+                    <h2>Tabela Hash</h2>
+                </div>
+                <ul class="examples">
+                    <li><a href="hash_table.html">Tabela Hash com Encadeamento Separado</a></li>
+                </ul>
+            </div>
+
+            <!-- Grafos -->
+            <div class="category">
+                <div class="category-header">
+                    <div class="category-icon">🕸️</div>
+                    <h2>Grafos</h2>
+                </div>
+                <ul class="examples">
+                    <li><a href="grafos_arbitragem_cambio.html">Arbitragem de Câmbio</a></li>
+                    <li><a href="grafos_cacheiro_viajante.html">Caixeiro Viajante</a></li>
+                    <li><a href="grafos_ciclo_semaforos.html">Ciclo de Semáforos</a></li>
+                    <li><a href="grafos_fluxo_maximo.html">Fluxo Máximo</a></li>
+                    <li><a href="grafos_veiculos_minas.html">Roteamento de Veículos</a></li>
+                    <li><a href="grafos_seam_carving.html">Seam Carving</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>Repositório de exemplos práticos para estudo de algoritmos e estruturas de dados</p>
+            <div class="stats">
+                <div class="stat">
+                    <span class="stat-number">10</span>
+                    <span class="stat-label">Exemplos</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-number">4</span>
+                    <span class="stat-label">Categorias</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-number">100%</span>
+                    <span class="stat-label">Interativo</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

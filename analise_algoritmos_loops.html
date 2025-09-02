@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Análise de Algoritmos - Loops Aninhados</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .cases-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .case {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            border: 2px solid #e9ecef;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .case:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+
+        .case-title {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        .complexity-box {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+
+        .complexity-box h4 {
+            color: #1976d2;
+            margin-bottom: 10px;
+        }
+
+        .code-container {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            overflow-x: auto;
+        }
+
+        .code-container pre {
+            margin: 0;
+        }
+
+        .execution-controls {
+            margin-bottom: 20px;
+        }
+
+        .execution-controls input {
+            width: 100px;
+            padding: 8px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            margin-right: 10px;
+            font-size: 16px;
+        }
+
+        .execution-controls button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: transform 0.2s ease;
+        }
+
+        .execution-controls button:hover {
+            transform: translateY(-2px);
+        }
+
+        .output-container {
+            background: #f1f3f4;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            min-height: 200px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.4;
+            overflow-y: auto;
+            max-height: 300px;
+        }
+
+        .output-container h4 {
+            color: #333;
+            margin-bottom: 10px;
+            border-bottom: 2px solid #ddd;
+            padding-bottom: 5px;
+        }
+
+        .iteration-count {
+            color: #d32f2f;
+            font-weight: bold;
+        }
+
+        .total-count {
+            color: #1976d2;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        .formula {
+            background: #fff3e0;
+            border-left: 4px solid #ff9800;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+        }
+
+        @media (max-width: 1200px) {
+            .cases-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+        }
+
+        .explanation {
+            background: #f0f8ff;
+            border-left: 4px solid #4caf50;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+
+        .explanation h4 {
+            color: #2e7d32;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Análise de Algoritmos</h1>
+            <p>Análise da Complexidade de Loops Aninhados</p>
+        </div>
+
+        <div class="content">
+            <div class="cases-grid">
+                <!-- Caso 1: Loops Independentes -->
+                <div class="case">
+                    <div class="case-title">Caso 1: Loops Independentes</div>
+                    
+                    <div class="complexity-box">
+                        <h4>Complexidade: O(N²)</h4>
+                        <p>Ambos os loops executam N vezes independentemente.</p>
+                        <div class="formula">Total = N × N = N²</div>
+                    </div>
+
+                    <div class="code-container">
+                        <pre>for (i = 1; i <= N; i++) {
+    for (j = 1; j <= N; j++) {
+        // Instrução executada N² vezes
+        contador++;
+    }
+}</pre>
+                    </div>
+
+                    <div class="execution-controls">
+                        <label>N = </label>
+                        <input type="number" id="n1" value="5" min="1" max="20">
+                        <button onclick="executarCaso1()">Executar</button>
+                    </div>
+
+                    <div class="output-container" id="output1">
+                        <h4>Saída da Execução:</h4>
+                        <div id="result1"></div>
+                    </div>
+
+                    <div class="explanation">
+                        <h4>Explicação:</h4>
+                        <p>• Loop externo: N iterações</p>
+                        <p>• Loop interno: N iterações para cada iteração do externo</p>
+                        <p>• Total: N × N = N² operações</p>
+                    </div>
+                </div>
+
+                <!-- Caso 2: Loops com Limite N-1 -->
+                <div class="case">
+                    <div class="case-title">Caso 2: Loops com Limite N-1</div>
+                    
+                    <div class="complexity-box">
+                        <h4>Complexidade: O((N-1)²)</h4>
+                        <p>Ambos os loops executam N-1 vezes.</p>
+                        <div class="formula">Total = (N-1) × (N-1) = (N-1)²</div>
+                    </div>
+
+                    <div class="code-container">
+                        <pre>for (i = 0; i < N-1; i++) {
+    for (j = 0; j < N-1; j++) {
+        // Instrução executada (N-1)² vezes
+        contador++;
+    }
+}</pre>
+                    </div>
+
+                    <div class="execution-controls">
+                        <label>N = </label>
+                        <input type="number" id="n2" value="5" min="1" max="20">
+                        <button onclick="executarCaso2()">Executar</button>
+                    </div>
+
+                    <div class="output-container" id="output2">
+                        <h4>Saída da Execução:</h4>
+                        <div id="result2"></div>
+                    </div>
+
+                    <div class="explanation">
+                        <h4>Explicação:</h4>
+                        <p>• Loop externo: N-1 iterações (0 até N-2)</p>
+                        <p>• Loop interno: N-1 iterações para cada iteração do externo</p>
+                        <p>• Total: (N-1) × (N-1) = (N-1)² operações</p>
+                    </div>
+                </div>
+
+                <!-- Caso 3: Loop Interno Dependente -->
+                <div class="case">
+                    <div class="case-title">Caso 3: Loop Interno Dependente</div>
+                    
+                    <div class="complexity-box">
+                        <h4>Complexidade: O(N²/2)</h4>
+                        <p>Loop interno diminui conforme i aumenta.</p>
+                        <div class="formula">Total = (N² - N) / 2</div>
+                    </div>
+
+                    <div class="code-container">
+                        <pre>for (i = 0; i < N-1; i++) {
+    for (j = i+1; j < N; j++) {
+        // Instrução executada (N²-N)/2 vezes
+        contador++;
+    }
+}</pre>
+                    </div>
+
+                    <div class="execution-controls">
+                        <label>N = </label>
+                        <input type="number" id="n3" value="5" min="1" max="20">
+                        <button onclick="executarCaso3()">Executar</button>
+                    </div>
+
+                    <div class="output-container" id="output3">
+                        <h4>Saída da Execução:</h4>
+                        <div id="result3"></div>
+                    </div>
+
+                    <div class="explanation">
+                        <h4>Explicação:</h4>
+                        <p>• Loop externo: N-1 iterações</p>
+                        <p>• Loop interno: diminui de N-1 até 1 iteração</p>
+                        <p>• Forma uma Progressão Aritmética: (N-1) + (N-2) + ... + 1</p>
+                        <p>• Soma da P.A.: (N² - N) / 2</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function executarCaso1() {
+            const n = parseInt(document.getElementById('n1').value);
+            let contador = 0;
+            let output = '';
+            
+            output += `<div class="iteration-count">Executando com N = ${n}</div><br>`;
+            
+            for (let i = 1; i <= n; i++) {
+                for (let j = 1; j <= n; j++) {
+                    contador++;
+                    output += `i=${i}, j=${j} → contador = ${contador}<br>`;
+                }
+                output += `<br>`;
+            }
+            
+            output += `<div class="total-count">Total de execuções: ${contador}</div>`;
+            output += `<div class="formula">Fórmula: N² = ${n}² = ${n*n}</div>`;
+            
+            document.getElementById('result1').innerHTML = output;
+        }
+
+        function executarCaso2() {
+            const n = parseInt(document.getElementById('n2').value);
+            let contador = 0;
+            let output = '';
+            
+            output += `<div class="iteration-count">Executando com N = ${n}</div><br>`;
+            
+            for (let i = 0; i < n-1; i++) {
+                for (let j = 0; j < n-1; j++) {
+                    contador++;
+                    output += `i=${i}, j=${j} → contador = ${contador}<br>`;
+                }
+                output += `<br>`;
+            }
+            
+            output += `<div class="total-count">Total de execuções: ${contador}</div>`;
+            output += `<div class="formula">Fórmula: (N-1)² = (${n}-1)² = ${(n-1)*(n-1)}</div>`;
+            
+            document.getElementById('result2').innerHTML = output;
+        }
+
+        function executarCaso3() {
+            const n = parseInt(document.getElementById('n3').value);
+            let contador = 0;
+            let output = '';
+            
+            output += `<div class="iteration-count">Executando com N = ${n}</div><br>`;
+            
+            for (let i = 0; i < n-1; i++) {
+                let iteracoesInternas = 0;
+                for (let j = i+1; j < n; j++) {
+                    contador++;
+                    iteracoesInternas++;
+                    output += `i=${i}, j=${j} → contador = ${contador}<br>`;
+                }
+                output += `<div style="color: #1976d2;">Para i=${i}: ${iteracoesInternas} iterações</div><br>`;
+            }
+            
+            output += `<div class="total-count">Total de execuções: ${contador}</div>`;
+            output += `<div class="formula">Fórmula: (N²-N)/2 = (${n}²-${n})/2 = ${(n*n-n)/2}</div>`;
+            
+            document.getElementById('result3').innerHTML = output;
+        }
+
+        // Executar todos os casos ao carregar a página
+        window.onload = function() {
+            executarCaso1();
+            executarCaso2();
+            executarCaso3();
+        };
+    </script>
+</body>
+</html> 

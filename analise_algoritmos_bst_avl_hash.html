@@ -1,0 +1,990 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Benchmark Visual de Estruturas de Dados</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #dbeafe 0%, #e0e7ff 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            color: #1f2937;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #6b7280;
+            font-size: 1.1rem;
+        }
+
+        .controls {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .controls-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        .section-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        .section-title::before {
+            content: '📊';
+            margin-right: 10px;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .input-group input {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #3b82f6;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn:disabled {
+            background: #d1d5db;
+            cursor: not-allowed;
+        }
+
+        .btn-primary {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: #2563eb;
+        }
+
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-success:hover:not(:disabled) {
+            background: #059669;
+        }
+
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+
+        .btn-danger:hover:not(:disabled) {
+            background: #dc2626;
+        }
+
+        .btn-purple {
+            background: #8b5cf6;
+            color: white;
+        }
+
+        .btn-purple:hover:not(:disabled) {
+            background: #7c3aed;
+        }
+
+        .btn-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .btn-small {
+            padding: 8px 12px;
+            font-size: 14px;
+        }
+
+        .operations {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        .chart-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            padding: 30px;
+            height: 350px;
+        }
+
+        .logs-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            padding: 30px;
+            height: 350px;
+        }
+
+        .logs {
+            height: 250px;
+            overflow-y: auto;
+            border: 2px solid #f3f4f6;
+            border-radius: 8px;
+            padding: 15px;
+        }
+
+        .log-entry {
+            padding: 8px 12px;
+            margin-bottom: 8px;
+            border-radius: 6px;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .log-info {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .log-success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .log-error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .log-timestamp {
+            font-size: 12px;
+            color: #6b7280;
+            margin-right: 8px;
+        }
+
+        .status {
+            font-size: 14px;
+            color: #6b7280;
+            margin-top: 10px;
+        }
+
+        .educational {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            padding: 30px;
+            margin-top: 30px;
+        }
+
+        .complexity-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .complexity-card {
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid;
+        }
+
+        .complexity-bst {
+            background: #f3e8ff;
+            border-left-color: #8b5cf6;
+        }
+
+        .complexity-avl {
+            background: #ecfdf5;
+            border-left-color: #10b981;
+        }
+
+        .complexity-hash {
+            background: #fef3c7;
+            border-left-color: #f59e0b;
+        }
+
+        .complexity-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .complexity-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .complexity-list li {
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+
+        .complexity-note {
+            font-size: 12px;
+            color: #6b7280;
+            margin-top: 8px;
+        }
+
+        @media (max-width: 768px) {
+            .controls-grid,
+            .results-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .btn-group {
+                flex-direction: column;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🏆 Benchmark Visual de Estruturas de Dados</h1>
+            <p>Compare o desempenho de BST, AVL e Hash Table com operações em nomes</p>
+        </div>
+
+        <!-- Controls -->
+        <div class="controls">
+            <div class="controls-grid">
+                <!-- Input Section -->
+                <div>
+                    <div class="section-title">➕ Entrada de Dados</div>
+                    
+                    <div class="input-group">
+                        <input type="text" id="nameInput" placeholder="Digite um nome...">
+                        <button class="btn btn-primary" onclick="addName()">Adicionar</button>
+                    </div>
+
+                    <div class="btn-group">
+                        <button class="btn btn-success btn-small" onclick="generateNames(100)">🎲 100 nomes</button>
+                        <button class="btn btn-success btn-small" onclick="generateNames(1000)">🎲 1.000 nomes</button>
+                        <button class="btn btn-success btn-small" onclick="generateNames(5000)">🎲 5.000 nomes</button>
+                        <button class="btn btn-danger btn-small" onclick="clearData()">🗑️ Limpar</button>
+                    </div>
+
+                    <div class="status" id="nameStatus">📝 0 nomes carregados</div>
+                </div>
+
+                <!-- Operations Section -->
+                <div>
+                    <div class="section-title">▶️ Operações de Benchmark</div>
+                    
+                    <div class="operations">
+                        <button class="btn btn-purple" onclick="runBenchmark('insert')" id="insertBtn">
+                            ➕ Benchmark Inserção
+                        </button>
+                        <button class="btn btn-primary" onclick="runBenchmark('search')" id="searchBtn">
+                            🔍 Benchmark Busca
+                        </button>
+                        <button class="btn btn-danger" onclick="runBenchmark('delete')" id="deleteBtn">
+                            🗑️ Benchmark Remoção
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results -->
+        <div class="results-grid">
+            <!-- Chart -->
+            <div class="chart-container">
+                <h3 class="section-title">⏱️ Comparação de Performance (ms)</h3>
+                <canvas id="benchmarkChart" width="400" height="200"></canvas>
+            </div>
+
+            <!-- Logs -->
+            <div class="logs-container">
+                <h3 class="section-title">ℹ️ Log de Operações</h3>
+                <div class="logs" id="logsContainer">
+                    <div style="text-align: center; color: #6b7280; margin-top: 100px;">
+                        Os logs das operações aparecerão aqui
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Educational Info -->
+        <div class="educational">
+            <h3 class="section-title">🎓 Complexidades Teóricas</h3>
+            <div class="complexity-grid">
+                <div class="complexity-card complexity-bst">
+                    <div class="complexity-title" style="color: #8b5cf6;">BST (Binary Search Tree)</div>
+                    <ul class="complexity-list">
+                        <li>• Busca: O(log n) - O(n)</li>
+                        <li>• Inserção: O(log n) - O(n)</li>
+                        <li>• Remoção: O(log n) - O(n)</li>
+                    </ul>
+                    <div class="complexity-note">*Pior caso: árvore desbalanceada</div>
+                </div>
+                <div class="complexity-card complexity-avl">
+                    <div class="complexity-title" style="color: #10b981;">AVL Tree</div>
+                    <ul class="complexity-list">
+                        <li>• Busca: O(log n)</li>
+                        <li>• Inserção: O(log n)</li>
+                        <li>• Remoção: O(log n)</li>
+                    </ul>
+                    <div class="complexity-note">*Auto-balanceada</div>
+                </div>
+                <div class="complexity-card complexity-hash">
+                    <div class="complexity-title" style="color: #f59e0b;">Hash Table</div>
+                    <ul class="complexity-list">
+                        <li>• Busca: O(1) - O(n)</li>
+                        <li>• Inserção: O(1) - O(n)</li>
+                        <li>• Remoção: O(1) - O(n)</li>
+                    </ul>
+                    <div class="complexity-note">*Depende de colisões</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // BST Node
+        class BSTNode {
+            constructor(value) {
+                this.value = value;
+                this.left = null;
+                this.right = null;
+            }
+        }
+
+        // BST Implementation
+        class BST {
+            constructor() {
+                this.root = null;
+            }
+
+            insert(value) {
+                this.root = this._insertRec(this.root, value);
+            }
+
+            _insertRec(node, value) {
+                if (!node) return new BSTNode(value);
+                
+                if (value < node.value) {
+                    node.left = this._insertRec(node.left, value);
+                } else if (value > node.value) {
+                    node.right = this._insertRec(node.right, value);
+                }
+                return node;
+            }
+
+            search(value) {
+                return this._searchRec(this.root, value);
+            }
+
+            _searchRec(node, value) {
+                if (!node || node.value === value) return node;
+                
+                if (value < node.value) {
+                    return this._searchRec(node.left, value);
+                }
+                return this._searchRec(node.right, value);
+            }
+
+            delete(value) {
+                this.root = this._deleteRec(this.root, value);
+            }
+
+            _deleteRec(node, value) {
+                if (!node) return node;
+
+                if (value < node.value) {
+                    node.left = this._deleteRec(node.left, value);
+                } else if (value > node.value) {
+                    node.right = this._deleteRec(node.right, value);
+                } else {
+                    if (!node.left) return node.right;
+                    if (!node.right) return node.left;
+
+                    node.value = this._minValue(node.right);
+                    node.right = this._deleteRec(node.right, node.value);
+                }
+                return node;
+            }
+
+            _minValue(node) {
+                while (node.left) node = node.left;
+                return node.value;
+            }
+        }
+
+        // AVL Node
+        class AVLNode {
+            constructor(value) {
+                this.value = value;
+                this.left = null;
+                this.right = null;
+                this.height = 1;
+            }
+        }
+
+        // AVL Tree Implementation
+        class AVLTree {
+            constructor() {
+                this.root = null;
+            }
+
+            _getHeight(node) {
+                return node ? node.height : 0;
+            }
+
+            _getBalance(node) {
+                return node ? this._getHeight(node.left) - this._getHeight(node.right) : 0;
+            }
+
+            _rotateRight(y) {
+                const x = y.left;
+                const T2 = x.right;
+
+                x.right = y;
+                y.left = T2;
+
+                y.height = Math.max(this._getHeight(y.left), this._getHeight(y.right)) + 1;
+                x.height = Math.max(this._getHeight(x.left), this._getHeight(x.right)) + 1;
+
+                return x;
+            }
+
+            _rotateLeft(x) {
+                const y = x.right;
+                const T2 = y.left;
+
+                y.left = x;
+                x.right = T2;
+
+                x.height = Math.max(this._getHeight(x.left), this._getHeight(x.right)) + 1;
+                y.height = Math.max(this._getHeight(y.left), this._getHeight(y.right)) + 1;
+
+                return y;
+            }
+
+            insert(value) {
+                this.root = this._insertRec(this.root, value);
+            }
+
+            _insertRec(node, value) {
+                if (!node) return new AVLNode(value);
+
+                if (value < node.value) {
+                    node.left = this._insertRec(node.left, value);
+                } else if (value > node.value) {
+                    node.right = this._insertRec(node.right, value);
+                } else {
+                    return node;
+                }
+
+                node.height = 1 + Math.max(this._getHeight(node.left), this._getHeight(node.right));
+
+                const balance = this._getBalance(node);
+
+                if (balance > 1 && value < node.left.value) {
+                    return this._rotateRight(node);
+                }
+
+                if (balance < -1 && value > node.right.value) {
+                    return this._rotateLeft(node);
+                }
+
+                if (balance > 1 && value > node.left.value) {
+                    node.left = this._rotateLeft(node.left);
+                    return this._rotateRight(node);
+                }
+
+                if (balance < -1 && value < node.right.value) {
+                    node.right = this._rotateRight(node.right);
+                    return this._rotateLeft(node);
+                }
+
+                return node;
+            }
+
+            search(value) {
+                return this._searchRec(this.root, value);
+            }
+
+            _searchRec(node, value) {
+                if (!node || node.value === value) return node;
+                
+                if (value < node.value) {
+                    return this._searchRec(node.left, value);
+                }
+                return this._searchRec(node.right, value);
+            }
+
+            delete(value) {
+                this.root = this._deleteRec(this.root, value);
+            }
+
+            _deleteRec(node, value) {
+                if (!node) return node;
+
+                if (value < node.value) {
+                    node.left = this._deleteRec(node.left, value);
+                } else if (value > node.value) {
+                    node.right = this._deleteRec(node.right, value);
+                } else {
+                    if (!node.left || !node.right) {
+                        const temp = node.left || node.right;
+                        if (!temp) {
+                            node = null;
+                        } else {
+                            node = temp;
+                        }
+                    } else {
+                        const temp = this._minValue(node.right);
+                        node.value = temp.value;
+                        node.right = this._deleteRec(node.right, temp.value);
+                    }
+                }
+
+                if (!node) return node;
+
+                node.height = 1 + Math.max(this._getHeight(node.left), this._getHeight(node.right));
+
+                const balance = this._getBalance(node);
+
+                if (balance > 1 && this._getBalance(node.left) >= 0) {
+                    return this._rotateRight(node);
+                }
+
+                if (balance > 1 && this._getBalance(node.left) < 0) {
+                    node.left = this._rotateLeft(node.left);
+                    return this._rotateRight(node);
+                }
+
+                if (balance < -1 && this._getBalance(node.right) <= 0) {
+                    return this._rotateLeft(node);
+                }
+
+                if (balance < -1 && this._getBalance(node.right) > 0) {
+                    node.right = this._rotateRight(node.right);
+                    return this._rotateLeft(node);
+                }
+
+                return node;
+            }
+
+            _minValue(node) {
+                while (node.left) node = node.left;
+                return node;
+            }
+        }
+
+        // Hash Table Implementation
+        class HashTable {
+            constructor(size = 1000) {
+                this.size = size;
+                this.buckets = new Array(size).fill(null).map(() => []);
+            }
+
+            _hash(key) {
+                let hash = 0;
+                for (let i = 0; i < key.length; i++) {
+                    hash = (hash + key.charCodeAt(i) * i) % this.size;
+                }
+                return hash;
+            }
+
+            insert(key) {
+                const index = this._hash(key);
+                const bucket = this.buckets[index];
+                
+                if (!bucket.includes(key)) {
+                    bucket.push(key);
+                }
+            }
+
+            search(key) {
+                const index = this._hash(key);
+                const bucket = this.buckets[index];
+                return bucket.includes(key);
+            }
+
+            delete(key) {
+                const index = this._hash(key);
+                const bucket = this.buckets[index];
+                const keyIndex = bucket.indexOf(key);
+                
+                if (keyIndex !== -1) {
+                    bucket.splice(keyIndex, 1);
+                }
+            }
+        }
+
+        // Global variables
+        let names = [];
+        let logs = [];
+        let isRunning = false;
+        let chart = null;
+        let bst = new BST();
+        let avl = new AVLTree();
+        let hashTable = new HashTable();
+
+        const sampleNames = [
+            'Ana', 'Bruno', 'Carlos', 'Diana', 'Eduardo', 'Fernanda', 'Gabriel', 'Helena', 'Igor', 'Julia',
+            'Kaio', 'Larissa', 'Marcos', 'Natalia', 'Otavio', 'Paula', 'Rafael', 'Sofia', 'Thiago', 'Vanessa',
+            'William', 'Ximena', 'Yago', 'Zara', 'Alice', 'Benjamin', 'Camila', 'Diego', 'Elisa', 'Felipe',
+            'Giovana', 'Henrique', 'Isabel', 'João', 'Karina', 'Lucas', 'Mariana', 'Nicolas', 'Olivia', 'Pedro'
+        ];
+
+        // Initialize chart
+        function initChart() {
+            const ctx = document.getElementById('benchmarkChart').getContext('2d');
+            chart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: [],
+                    datasets: [
+                        {
+                            label: 'BST',
+                            data: [],
+                            backgroundColor: '#8b5cf6',
+                            borderColor: '#7c3aed',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'AVL',
+                            data: [],
+                            backgroundColor: '#10b981',
+                            borderColor: '#059669',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Hash Table',
+                            data: [],
+                            backgroundColor: '#f59e0b',
+                            borderColor: '#d97706',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    aspectRatio: 2,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Tempo (ms)'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Operação'
+                            }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ' + context.parsed.y + ' ms';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Generate random names
+        function generateRandomNames(count) {
+            const randomNames = [];
+            for (let i = 0; i < count; i++) {
+                const baseName = sampleNames[Math.floor(Math.random() * sampleNames.length)];
+                randomNames.push(`${baseName}${i + 1}`);
+            }
+            return randomNames;
+        }
+
+        // Add name
+        function addName() {
+            const input = document.getElementById('nameInput');
+            const name = input.value.trim();
+            
+            if (name && !names.includes(name)) {
+                names.push(name);
+                input.value = '';
+                updateNameStatus();
+            }
+        }
+
+        // Generate names
+        function generateNames(count) {
+            const newNames = generateRandomNames(count);
+            names = newNames;
+            updateNameStatus();
+            addLog(`✨ Gerados ${count} nomes aleatórios`, 'info');
+        }
+
+        // Clear data
+        function clearData() {
+            names = [];
+            logs = [];
+            bst = new BST();
+            avl = new AVLTree();
+            hashTable = new HashTable();
+            
+            updateNameStatus();
+            updateLogs();
+            
+            // Clear chart
+            chart.data.labels = [];
+            chart.data.datasets.forEach(dataset => {
+                dataset.data = [];
+            });
+            chart.update();
+            
+            addLog('🧹 Dados limpos', 'info');
+        }
+
+        // Update name status
+        function updateNameStatus() {
+            document.getElementById('nameStatus').textContent = `📝 ${names.length} nomes carregados`;
+        }
+
+        // Add log
+        function addLog(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            logs.push({ message, type, timestamp });
+            
+            // Keep only last 10 logs
+            if (logs.length > 10) {
+                logs = logs.slice(-10);
+            }
+            
+            updateLogs();
+        }
+
+        // Update logs display
+        function updateLogs() {
+            const container = document.getElementById('logsContainer');
+            
+            if (logs.length === 0) {
+                container.innerHTML = '<div style="text-align: center; color: #6b7280; margin-top: 100px;">Os logs das operações aparecerão aqui</div>';
+                return;
+            }
+            
+            container.innerHTML = logs.map(log => 
+                `<div class="log-entry log-${log.type}">
+                    <span class="log-timestamp">${log.timestamp}</span>
+                    ${log.message}
+                </div>`
+            ).join('');
+            
+            // Scroll to bottom
+            container.scrollTop = container.scrollHeight;
+        }
+
+        // Measure time
+        function measureTime(fn) {
+            const start = performance.now();
+            fn();
+            const end = performance.now();
+            return (end - start).toFixed(3);
+        }
+
+        // Update buttons state
+        function updateButtonsState(running) {
+            const buttons = ['insertBtn', 'searchBtn', 'deleteBtn'];
+            buttons.forEach(id => {
+                const btn = document.getElementById(id);
+                btn.disabled = running || names.length === 0;
+                if (running) {
+                    btn.textContent = btn.textContent.replace(/Benchmark/, 'Testando...');
+                } else {
+                    btn.textContent = btn.textContent.replace(/Testando.../, 'Benchmark');
+                }
+            });
+        }
+
+        // Run benchmark
+        async function runBenchmark(operation) {
+            if (names.length === 0) {
+                addLog('❌ Adicione nomes primeiro!', 'error');
+                return;
+            }
+
+            isRunning = true;
+            updateButtonsState(true);
+            
+            const results = { operation, BST: 0, AVL: 0, HashTable: 0 };
+
+            // Reset structures for fair comparison
+            bst = new BST();
+            avl = new AVLTree();
+            hashTable = new HashTable();
+
+            // Insert all names first if operation is not insert
+            if (operation !== 'insert') {
+                names.forEach(name => {
+                    bst.insert(name);
+                    avl.insert(name);
+                    hashTable.insert(name);
+                });
+            }
+
+            // Simulate async operation
+            await new Promise(resolve => setTimeout(resolve, 100));
+
+            if (operation === 'insert') {
+                // Measure insertion time
+                results.BST = measureTime(() => {
+                    names.forEach(name => bst.insert(name));
+                });
+
+                results.AVL = measureTime(() => {
+                    names.forEach(name => avl.insert(name));
+                });
+
+                results.HashTable = measureTime(() => {
+                    names.forEach(name => hashTable.insert(name));
+                });
+
+                addLog(`📊 Inserção de ${names.length} nomes - BST: ${results.BST}ms | AVL: ${results.AVL}ms | Hash: ${results.HashTable}ms`, 'success');
+            
+            } else if (operation === 'search') {
+                // Search for random names
+                const searchNames = names.slice(0, Math.min(100, names.length));
+                
+                results.BST = measureTime(() => {
+                    searchNames.forEach(name => bst.search(name));
+                });
+
+                results.AVL = measureTime(() => {
+                    searchNames.forEach(name => avl.search(name));
+                });
+
+                results.HashTable = measureTime(() => {
+                    searchNames.forEach(name => hashTable.search(name));
+                });
+
+                addLog(`🔍 Busca de ${searchNames.length} nomes - BST: ${results.BST}ms | AVL: ${results.AVL}ms | Hash: ${results.HashTable}ms`, 'success');
+            
+            } else if (operation === 'delete') {
+                // Delete random names
+                const deleteNames = names.slice(0, Math.min(50, names.length));
+                
+                results.BST = measureTime(() => {
+                    deleteNames.forEach(name => bst.delete(name));
+                });
+
+                results.AVL = measureTime(() => {
+                    deleteNames.forEach(name => avl.delete(name));
+                });
+
+                results.HashTable = measureTime(() => {
+                    deleteNames.forEach(name => hashTable.delete(name));
+                });
+
+                addLog(`🗑️ Remoção de ${deleteNames.length} nomes - BST: ${results.BST}ms | AVL: ${results.AVL}ms | Hash: ${results.HashTable}ms`, 'success');
+            }
+
+            // Update chart
+            updateChart(results);
+            
+            isRunning = false;
+            updateButtonsState(false);
+        }
+
+        // Update chart with new data
+        function updateChart(results) {
+            // Keep only last 5 results
+            if (chart.data.labels.length >= 5) {
+                chart.data.labels.shift();
+                chart.data.datasets.forEach(dataset => {
+                    dataset.data.shift();
+                });
+            }
+            
+            chart.data.labels.push(results.operation);
+            chart.data.datasets[0].data.push(parseFloat(results.BST));
+            chart.data.datasets[1].data.push(parseFloat(results.AVL));
+            chart.data.datasets[2].data.push(parseFloat(results.HashTable));
+            
+            chart.update();
+        }
+
+        // Handle Enter key in input
+        document.getElementById('nameInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                addName();
+            }
+        });
+
+        // Initialize on page load
+        window.addEventListener('load', function() {
+            initChart();
+            updateNameStatus();
+            updateLogs();
+        });
+    </script>
+</body>
+</html>
