@@ -37,7 +37,10 @@ tpa/
 ├── grafos_fluxo_maximo.html                # Fluxo máximo
 ├── grafos_seam_carving.html                # Seam carving
 ├── grafos_veiculos_minas.html              # Roteamento de veículos
-├── hash_table.html                         # Tabela hash
+├── tabela_hash.html                        # Tabela hash com encadeamento separado
+├── tabela_hash_hashcode.html               # Visualizador de HashCode para strings
+├── tabela_hash.svg                         # Diagrama de tabela hash
+├── tabela_hash_colisoes.svg                # Diagrama de colisões em hash
 └── README.md                               # Este arquivo
 ```
 
@@ -54,9 +57,11 @@ tpa/
 - Balanceamento com árvores AVL
 
 ### #️⃣ Tabela Hash
-- Implementação de hash table
-- Tratamento de colisões
-- Análise de performance
+- **Tabela Hash com Encadeamento Separado**: Implementação interativa com visualização
+- **Visualizador de HashCode**: Demonstração passo a passo do cálculo de hashCode para strings
+- **Tratamento de Colisões**: Estratégias de resolução e análise
+- **Análise de Performance**: Comparação de diferentes implementações
+- **Diagramas Visuais**: Representações SVG de estruturas e colisões
 
 ### 🕸️ Grafos
 - **Arbitragem de Câmbio**: Detecção de ciclos negativos

@@ -1,0 +1,166 @@
+<svg width="900" height="600" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="900" height="600" fill="#f8f9fa"/>
+  
+  <!-- Title -->
+  <text x="450" y="30" text-anchor="middle" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="#2c3e50">Tabela Hash com Colisões - Encadeamento Separado</text>
+  
+  <!-- First Object/Key Section (João) -->
+  <g>
+    <!-- Object Box -->
+    <rect x="30" y="80" width="100" height="60" fill="#e8f5e8" stroke="#27ae60" stroke-width="2" rx="5"/>
+    <text x="80" y="100" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="#27ae60">Nome</text>
+    <text x="80" y="115" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="bold" fill="#2c3e50">"João"</text>
+    <text x="80" y="130" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#7f8c8d">hashCode: 12345</text>
+  </g>
+  
+  <!-- Second Object/Key Section (José) -->
+  <g>
+    <rect x="30" y="160" width="100" height="60" fill="#ffe8e8" stroke="#e74c3c" stroke-width="2" rx="5"/>
+    <text x="80" y="180" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="#e74c3c">Nome</text>
+    <text x="80" y="195" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="bold" fill="#2c3e50">"José"</text>
+    <text x="80" y="210" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#7f8c8d">hashCode: 54321</text>
+  </g>
+  
+  <!-- Arrow 1: João to HashCode -->
+  <path d="M 130 110 L 170 110" stroke="#3498db" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+  <text x="150" y="105" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#3498db">hashCode()</text>
+  
+  <!-- Arrow 2: José to HashCode -->
+  <path d="M 130 190 L 170 190" stroke="#3498db" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+  <text x="150" y="185" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#3498db">hashCode()</text>
+  
+  <!-- HashCode Section -->
+  <g>
+    <rect x="180" y="80" width="90" height="60" fill="#e3f2fd" stroke="#2196f3" stroke-width="2" rx="5"/>
+    <text x="225" y="100" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="#2196f3">HashCode</text>
+    <text x="225" y="115" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#2c3e50">12345</text>
+    <text x="225" y="130" text-anchor="middle" font-family="Arial, sans-serif" font-size="8" fill="#7f8c8d">(João)</text>
+    
+    <rect x="180" y="160" width="90" height="60" fill="#ffe3e3" stroke="#e74c3c" stroke-width="2" rx="5"/>
+    <text x="225" y="180" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="#e74c3c">HashCode</text>
+    <text x="225" y="195" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#2c3e50">54321</text>
+    <text x="225" y="210" text-anchor="middle" font-family="Arial, sans-serif" font-size="8" fill="#7f8c8d">(José)</text>
+  </g>
+  
+  <!-- Arrow 3: HashCode to Hash Function -->
+  <path d="M 270 110 L 310 110" stroke="#e74c3c" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+  <text x="290" y="105" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#e74c3c">hash()</text>
+  
+  <path d="M 270 190 L 310 190" stroke="#e74c3c" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+  <text x="290" y="185" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#e74c3c">hash()</text>
+  
+  <!-- Hash Function Section -->
+  <g>
+    <rect x="320" y="70" width="120" height="80" fill="#ffeaa7" stroke="#fdcb6e" stroke-width="2" rx="5"/>
+    <text x="380" y="90" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="#e17055">Função Hash</text>
+    <text x="380" y="110" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#2c3e50">12345 % 6 = 3</text>
+    <text x="380" y="125" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#7f8c8d">(João → índice 3)</text>
+    <text x="380" y="140" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#2c3e50">54321 % 6 = 3</text>
+    
+    <rect x="320" y="160" width="120" height="60" fill="#ffcccc" stroke="#e74c3c" stroke-width="2" rx="5"/>
+    <text x="380" y="180" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="#e74c3c">COLISÃO!</text>
+    <text x="380" y="195" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#2c3e50">José também vai</text>
+    <text x="380" y="210" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#2c3e50">para o índice 3</text>
+  </g>
+  
+  <!-- Arrow 4: Hash Function to Array -->
+  <path d="M 440 130 L 490 130" stroke="#9b59b6" stroke-width="3" fill="none" marker-end="url(#arrowhead)"/>
+  
+  <!-- Hash Table Array with Linked Lists -->
+  <g>
+    <!-- Array structure -->
+    <rect x="500" y="60" width="350" height="350" fill="#ffffff" stroke="#34495e" stroke-width="2" rx="5"/>
+    <text x="675" y="50" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#2c3e50">Tabela Hash com Listas Encadeadas</text>
+    
+    <!-- Array indices and slots -->
+    <!-- Index 0 -->
+    <rect x="510" y="70" width="30" height="40" fill="#ecf0f1" stroke="#bdc3c7" stroke-width="1"/>
+    <text x="525" y="93" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#2c3e50">0</text>
+    <rect x="545" y="70" width="80" height="40" fill="#ffffff" stroke="#bdc3c7" stroke-width="1"/>
+    <text x="585" y="93" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#7f8c8d">null</text>
+    
+    <!-- Index 1 -->
+    <rect x="510" y="115" width="30" height="40" fill="#ecf0f1" stroke="#bdc3c7" stroke-width="1"/>
+    <text x="525" y="138" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#2c3e50">1</text>
+    <rect x="545" y="115" width="80" height="40" fill="#ffffff" stroke="#bdc3c7" stroke-width="1"/>
+    <text x="585" y="138" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#7f8c8d">null</text>
+    
+    <!-- Index 2 -->
+    <rect x="510" y="160" width="30" height="40" fill="#ecf0f1" stroke="#bdc3c7" stroke-width="1"/>
+    <text x="525" y="183" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#2c3e50">2</text>
+    <rect x="545" y="160" width="80" height="40" fill="#ffffff" stroke="#bdc3c7" stroke-width="1"/>
+    <text x="585" y="183" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#7f8c8d">null</text>
+    
+    <!-- Index 3 - WITH LINKED LIST (COLLISION RESOLUTION) -->
+    <rect x="510" y="205" width="30" height="40" fill="#fff3cd" stroke="#ffc107" stroke-width="3"/>
+    <text x="525" y="228" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#856404">3</text>
+    
+    <!-- First node in linked list (José - inserted first, so it's at the head) -->
+    <rect x="545" y="205" width="80" height="40" fill="#ffe8e8" stroke="#e74c3c" stroke-width="2"/>
+    <text x="585" y="220" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="#e74c3c">José</text>
+    <text x="585" y="235" text-anchor="middle" font-family="Arial, sans-serif" font-size="8" fill="#2c3e50">54321</text>
+    
+    <!-- Arrow from José to João -->
+    <path d="M 625 225 L 645 225" stroke="#34495e" stroke-width="2" fill="none" marker-end="url(#arrowhead-small)"/>
+    
+    <!-- Second node in linked list (João - was there first, now second) -->
+    <rect x="650" y="205" width="80" height="40" fill="#e8f5e8" stroke="#27ae60" stroke-width="2"/>
+    <text x="690" y="220" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="#27ae60">João</text>
+    <text x="690" y="235" text-anchor="middle" font-family="Arial, sans-serif" font-size="8" fill="#2c3e50">12345</text>
+    
+    <!-- Arrow from João to null -->
+    <path d="M 730 225 L 750 225" stroke="#34495e" stroke-width="2" fill="none" marker-end="url(#arrowhead-small)"/>
+    <rect x="755" y="215" width="40" height="20" fill="#f8f9fa" stroke="#6c757d" stroke-width="1"/>
+    <text x="775" y="228" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#6c757d">null</text>
+    
+    <!-- Index 4 -->
+    <rect x="510" y="250" width="30" height="40" fill="#ecf0f1" stroke="#bdc3c7" stroke-width="1"/>
+    <text x="525" y="273" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#2c3e50">4</text>
+    <rect x="545" y="250" width="80" height="40" fill="#ffffff" stroke="#bdc3c7" stroke-width="1"/>
+    <text x="585" y="273" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#7f8c8d">null</text>
+    
+    <!-- Index 5 -->
+    <rect x="510" y="295" width="30" height="40" fill="#ecf0f1" stroke="#bdc3c7" stroke-width="1"/>
+    <text x="525" y="318" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#2c3e50">5</text>
+    <rect x="545" y="295" width="80" height="40" fill="#ffffff" stroke="#bdc3c7" stroke-width="1"/>
+    <text x="585" y="318" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#7f8c8d">null</text>
+  </g>
+  
+  <!-- Insertion order explanation -->
+  <g>
+    <rect x="500" y="350" width="350" height="80" fill="#fff3cd" stroke="#ffc107" stroke-width="2" rx="5"/>
+    <text x="675" y="370" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#856404">Ordem de Inserção:</text>
+    <text x="520" y="390" font-family="Arial, sans-serif" font-size="12" fill="#2c3e50">1. João foi inserido primeiro no índice 3</text>
+    <text x="520" y="405" font-family="Arial, sans-serif" font-size="12" fill="#2c3e50">2. José foi inserido depois, mas fica no INÍCIO da lista</text>
+    <text x="520" y="420" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#e74c3c">Resultado: José → João → null</text>
+  </g>
+  
+  <!-- Legend/Explanation Box -->
+  <g>
+    <rect x="50" y="450" width="800" height="130" fill="#ffffff" stroke="#34495e" stroke-width="2" rx="5"/>
+    <text x="450" y="470" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#2c3e50">Encadeamento Separado - Resolução de Colisões:</text>
+    
+    <text x="70" y="495" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#e74c3c">• Colisão:</text>
+    <text x="140" y="495" font-family="Arial, sans-serif" font-size="12" fill="#2c3e50">Dois elementos (João e José) têm o mesmo índice hash (3)</text>
+    
+    <text x="70" y="515" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#ffc107">• Solução:</text>
+    <text x="140" y="515" font-family="Arial, sans-serif" font-size="12" fill="#2c3e50">Cada posição do array aponta para uma lista encadeada</text>
+    
+    <text x="70" y="535" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#27ae60">• Inserção:</text>
+    <text x="140" y="535" font-family="Arial, sans-serif" font-size="12" fill="#2c3e50">Novos elementos são inseridos no INÍCIO da lista (melhor performance)</text>
+    
+    <text x="70" y="555" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#3498db">• Busca:</text>
+    <text x="120" y="555" font-family="Arial, sans-serif" font-size="12" fill="#2c3e50">Percorre a lista até encontrar o elemento ou chegar ao final (null)</text>
+  </g>
+  
+  <!-- Arrow markers -->
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#3498db"/>
+    </marker>
+    <marker id="arrowhead-small" markerWidth="8" markerHeight="5" refX="7" refY="2.5" orient="auto">
+      <polygon points="0 0, 8 2.5, 0 5" fill="#34495e"/>
+    </marker>
+  </defs>
+</svg>

@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HashCode Visualizer - Strings</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        h1 {
+            text-align: center;
+            color: #4a5568;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #718096;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+
+        .formula {
+            background: #f7fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 1.1em;
+            text-align: center;
+        }
+
+        .input-section {
+            background: #f8f9ff;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 5px solid #667eea;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.2em;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.1em;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: transform 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+        }
+
+        .steps-container {
+            margin-top: 30px;
+        }
+
+        .step {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+            transition: all 0.3s;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .step.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .step-header {
+            font-weight: bold;
+            color: #4a5568;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .step-number {
+            background: #667eea;
+            color: white;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9em;
+        }
+
+        .character-row {
+            display: flex;
+            gap: 10px;
+            margin: 10px 0;
+            flex-wrap: wrap;
+        }
+
+        .char-box {
+            background: #e2e8f0;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            min-width: 50px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .char-box.highlight {
+            background: #fed7d7;
+            border: 2px solid #f56565;
+            animation: pulse 1s;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .calculation {
+            background: #f0fff4;
+            border: 1px solid #9ae6b4;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            margin: 10px 0;
+            white-space: pre-line;
+        }
+
+        .final-result {
+            background: linear-gradient(135deg, #48bb78, #38a169);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 1.3em;
+            margin: 20px 0;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .comparison-section {
+            background: #fffaf0;
+            border: 2px solid #feb2b2;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        .comparison-table th, .comparison-table td {
+            border: 1px solid #e2e8f0;
+            padding: 12px;
+            text-align: left;
+        }
+
+        .comparison-table th {
+            background: #f7fafc;
+            font-weight: bold;
+        }
+
+        .example-buttons {
+            display: flex;
+            gap: 10px;
+            margin: 15px 0;
+            flex-wrap: wrap;
+        }
+
+        .example-btn {
+            background: #e2e8f0;
+            color: #4a5568;
+            border: 1px solid #cbd5e0;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.2s;
+        }
+
+        .example-btn:hover {
+            background: #cbd5e0;
+            transform: none;
+        }
+
+        .note {
+            background: #ebf8ff;
+            border-left: 4px solid #3182ce;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+            font-style: italic;
+        }
+
+        .collision-section {
+            background: #f7fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .collision-result {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+        }
+
+        .collision-string {
+            font-family: 'Courier New', monospace;
+            background: #f0fff4;
+            padding: 2px 6px;
+            border-radius: 4px;
+            border: 1px solid #9ae6b4;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 30px;
+            color: #4a5568;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 HashCode Visualizer</h1>
+        <p class="subtitle">Implementação didática da função hashCode() para Strings em Java</p>
+
+        <div class="formula">
+            <strong>Fórmula:</strong> hash = (hash * 31) + charAt(i)
+            <br><br>
+            <strong>Algoritmo completo:</strong><br>
+            <pre style="margin: 10px 0; font-family: 'Courier New', monospace; background: #f0f0f0; padding: 10px; border-radius: 5px; text-align: left;">int hash = 0;
+for (int i = 0; i < length(); i++)
+    hash = (hash * 31) + charAt(i);
+return hash;</pre>
+        </div>
+
+        <div class="input-section">
+            <label for="stringInput"><strong>Digite uma string para calcular seu hashCode:</strong></label>
+            <input type="text" id="stringInput" placeholder="Ex: Hello" maxlength="20">
+            <button onclick="calculateHashCode()">Calcular HashCode</button>
+            
+            <div class="example-buttons">
+                <strong>Exemplos rápidos:</strong>
+                <button class="example-btn" onclick="setExample('Hello')">Hello</button>
+                <button class="example-btn" onclick="setExample('Java')">Java</button>
+                <button class="example-btn" onclick="setExample('ABC')">ABC</button>
+                <button class="example-btn" onclick="setExample('a')">a</button>
+                <button class="example-btn" onclick="setExample('ab')">ab</button>
+            </div>
+            
+            <div style="margin-top: 20px; padding: 15px; background: #fff5f5; border-radius: 8px; border-left: 4px solid #f56565;">
+                <button id="collisionBtn" onclick="toggleCollisionMode()">Gerar Colisões</button>
+                <div id="collisionInputs" style="display: none; margin-top: 15px;">
+                    <label for="collisionCount"><strong>Número de colisões para encontrar:</strong></label>
+                    <input type="number" id="collisionCount" value="5" min="1" max="20" style="width: 80px; margin: 10px;">
+                    <button onclick="generateCollisions()">Buscar Colisões</button>
+                    <p style="font-size: 0.9em; color: #666; margin-top: 10px;">
+                        <strong>⚠️ Aviso:</strong> A busca por colisões pode demorar alguns segundos ou minutos, dependendo da string.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div id="stepsContainer" class="steps-container"></div>
+        
+        <div class="note">
+            <strong>💡 Por que multiplicar por 31?</strong><br>
+            O número 31 é primo e oferece uma boa distribuição de hash codes. Sendo primo, reduz colisões.
+            Além disso, 31 * i pode ser otimizado para (i << 5) - i, tornando a operação mais rápida.
+        </div>
+    </div>
+
+    <script>
+        function setExample(text) {
+            document.getElementById('stringInput').value = text;
+            calculateHashCode();
+        }
+
+        function calculateHashCode() {
+            const input = document.getElementById('stringInput').value;
+            const container = document.getElementById('stepsContainer');
+            
+            if (!input) {
+                container.innerHTML = '<p style="color: #e53e3e; text-align: center;">Por favor, digite uma string!</p>';
+                return;
+            }
+
+            container.innerHTML = '';
+            
+            // Mostrar a string e seus caracteres
+            showStringBreakdown(input, container);
+            
+            // Calcular passo a passo
+            let hash = 0;
+            let steps = [];
+            
+            for (let i = 0; i < input.length; i++) {
+                const char = input.charAt(i);
+                const charCode = input.charCodeAt(i);
+                const previousHash = hash;
+                hash = (hash * 31) + charCode;
+                
+                steps.push({
+                    iteration: i + 1,
+                    char: char,
+                    charCode: charCode,
+                    previousHash: previousHash,
+                    calculation: `(${previousHash} * 31) + ${charCode} = ${previousHash * 31} + ${charCode} = ${hash}`,
+                    newHash: hash
+                });
+            }
+            
+            // Mostrar cada passo com delay para animação
+            steps.forEach((step, index) => {
+                setTimeout(() => {
+                    showStep(step, container, input, index);
+                }, (index + 1) * 800);
+            });
+            
+            // Mostrar resultado final
+            setTimeout(() => {
+                showFinalResult(hash, input, container);
+                showComparison(container);
+            }, (steps.length + 1) * 800);
+        }
+
+        function showStringBreakdown(str, container) {
+            const breakdownDiv = document.createElement('div');
+            breakdownDiv.className = 'step visible';
+            
+            let charBoxes = '';
+            for (let i = 0; i < str.length; i++) {
+                const char = str.charAt(i);
+                const charCode = str.charCodeAt(i);
+                charBoxes += `<div class="char-box">
+                    <div><strong>'${char}'</strong></div>
+                    <div>ASCII: ${charCode}</div>
+                </div>`;
+            }
+            
+            breakdownDiv.innerHTML = `
+                <div class="step-header">
+                    <div class="step-number">📝</div>
+                    Análise da String: "${str}"
+                </div>
+                <div class="character-row">${charBoxes}</div>
+                <p><strong>Comprimento:</strong> ${str.length} caracteres</p>
+            `;
+            
+            container.appendChild(breakdownDiv);
+        }
+
+        function showStep(step, container, originalString, index) {
+            const stepDiv = document.createElement('div');
+            stepDiv.className = 'step';
+            
+            // Criar visualização dos caracteres com destaque
+            let charBoxes = '';
+            for (let i = 0; i < originalString.length; i++) {
+                const char = originalString.charAt(i);
+                const charCode = originalString.charCodeAt(i);
+                const isHighlighted = i === (step.iteration - 1);
+                charBoxes += `<div class="char-box ${isHighlighted ? 'highlight' : ''}">
+                    <div><strong>'${char}'</strong></div>
+                    <div>ASCII: ${charCode}</div>
+                </div>`;
+            }
+            
+            stepDiv.innerHTML = `
+                <div class="step-header">
+                    <div class="step-number">${step.iteration}</div>
+                    Processando caractere '${step.char}' (posição ${step.iteration - 1})
+                </div>
+                <div class="character-row">${charBoxes}</div>
+                <div class="calculation">
+                    <strong>Cálculo:</strong>
+                    hash anterior = ${step.previousHash}
+                    Caractere atual = '${step.char}' (ASCII = ${step.charCode})
+                    
+                    <strong>Aplicando a fórmula:</strong>
+                    ${step.calculation}
+                    
+                    <strong>Novo hash = ${step.newHash}</strong>
+                </div>
+            `;
+            
+            container.appendChild(stepDiv);
+            
+            // Animar a entrada
+            setTimeout(() => {
+                stepDiv.classList.add('visible');
+            }, 100);
+        }
+
+        function showFinalResult(hash, str, container) {
+            const resultDiv = document.createElement('div');
+            resultDiv.className = 'final-result';
+            resultDiv.innerHTML = `
+                <h3>🎉 Resultado Final</h3>
+                <p><strong>String:</strong> "${str}"</p>
+                <p><strong>HashCode:</strong> ${hash}</p>
+            `;
+            container.appendChild(resultDiv);
+        }
+
+        function showComparison(container) {
+            const comparisonDiv = document.createElement('div');
+            comparisonDiv.className = 'comparison-section';
+            
+            // Testando algumas strings similares
+            const testStrings = ['Hello', 'hello', 'Hello!', 'Helo', 'Java'];
+            let tableRows = '';
+            
+            testStrings.forEach(str => {
+                const hash = calculateJavaHashCode(str);
+                tableRows += `<tr><td>"${str}"</td><td>${hash}</td></tr>`;
+            });
+            
+            comparisonDiv.innerHTML = `
+                <h3>📊 Comparação de HashCodes</h3>
+                <p>Veja como pequenas mudanças na string resultam em hashCodes bem diferentes:</p>
+                <table class="comparison-table">
+                    <tr><th>String</th><th>HashCode</th></tr>
+                    ${tableRows}
+                </table>
+                <p><em>Note como strings similares produzem hashCodes completamente diferentes, 
+                o que é uma característica desejada para uma boa função hash!</em></p>
+            `;
+            
+            container.appendChild(comparisonDiv);
+        }
+
+        function calculateJavaHashCode(str) {
+            let hash = 0;
+            for (let i = 0; i < str.length; i++) {
+                hash = (hash * 31) + str.charCodeAt(i);
+            }
+            return hash;
+        }
+
+        function toggleCollisionMode() {
+            const collisionInputs = document.getElementById('collisionInputs');
+            const btn = document.getElementById('collisionBtn');
+            
+            if (collisionInputs.style.display === 'none') {
+                collisionInputs.style.display = 'block';
+                btn.textContent = 'Ocultar Colisões';
+            } else {
+                collisionInputs.style.display = 'none';
+                btn.textContent = 'Gerar Colisões';
+            }
+        }
+
+        function generateCollisions() {
+            const input = document.getElementById('stringInput').value;
+            const count = parseInt(document.getElementById('collisionCount').value) || 5;
+            const container = document.getElementById('stepsContainer');
+            
+            if (!input) {
+                container.innerHTML = '<p style="color: #e53e3e; text-align: center;">Por favor, digite uma string primeiro!</p>';
+                return;
+            }
+
+            if (count < 1 || count > 20) {
+                container.innerHTML = '<p style="color: #e53e3e; text-align: center;">Por favor, digite um número entre 1 e 20!</p>';
+                return;
+            }
+
+            const targetHash = calculateJavaHashCode(input);
+            
+            // Mostrar loading
+            container.innerHTML = `
+                <div class="loading">
+                    <div class="spinner"></div>
+                    Gerando strings com o mesmo hashCode que "${input}" (${targetHash})...
+                    <br><small>Isso pode levar alguns segundos...</small>
+                </div>
+            `;
+
+            // Usar setTimeout para não bloquear a UI
+            setTimeout(() => {
+                const collisions = findCollisions(targetHash, count, input);
+                displayCollisions(input, targetHash, collisions, container);
+            }, 100);
+        }
+
+        function findCollisions(targetHash, maxCount, originalString) {
+            const collisions = [];
+            const maxAttempts = 50000000; // Aumentado para 50 milhões para garantir 20 segundos completos
+            const timeoutMs = 20000; // 20 segundos
+            const startTime = Date.now();
+            let attempts = 0;
+            
+            // Estratégia: gerar strings aleatórias de tamanhos variados
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%&*';
+            
+            while (collisions.length < maxCount && attempts < maxAttempts) {
+                attempts++;
+                
+                // Verificar timeout
+                if (Date.now() - startTime > timeoutMs) {
+                    break;
+                }
+                
+                // Gerar string aleatória de tamanho entre 1 e 15 (aumentado)
+                const length = Math.floor(Math.random() * 15) + 1;
+                let randomString = '';
+                
+                for (let i = 0; i < length; i++) {
+                    randomString += chars.charAt(Math.floor(Math.random() * chars.length));
+                }
+                
+                // Verificar se o hash bate e se não é a string original
+                if (calculateJavaHashCode(randomString) === targetHash && randomString !== originalString) {
+                    // Verificar se já não temos essa string
+                    if (!collisions.includes(randomString)) {
+                        collisions.push(randomString);
+                    }
+                }
+                
+                // Estratégia adicional: modificar a string original (mais frequente)
+                if (attempts % 5000 === 0 && collisions.length < maxCount) {
+                    const modifiedStrings = generateModifiedStrings(originalString, targetHash);
+                    modifiedStrings.forEach(str => {
+                        if (!collisions.includes(str) && str !== originalString && collisions.length < maxCount) {
+                            collisions.push(str);
+                        }
+                    });
+                }
+                
+                // Estratégia adicional: strings com caracteres especiais
+                if (attempts % 7500 === 0 && collisions.length < maxCount) {
+                    for (let len = 1; len <= 8; len++) {
+                        const specialString = generateSpecialString(len, targetHash);
+                        if (specialString && calculateJavaHashCode(specialString) === targetHash && 
+                            specialString !== originalString && !collisions.includes(specialString)) {
+                            collisions.push(specialString);
+                            if (collisions.length >= maxCount) break;
+                        }
+                    }
+                }
+            }
+            
+            const timeElapsed = Date.now() - startTime;
+            const timedOut = timeElapsed >= timeoutMs;
+            
+            return {
+                found: collisions,
+                attempts: attempts,
+                maxReached: attempts >= maxAttempts,
+                timedOut: timedOut,
+                timeElapsed: Math.round(timeElapsed / 1000)
+            };
+        }
+
+        function generateModifiedStrings(original, targetHash) {
+            const results = [];
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            
+            // Tentar adicionar caracteres no final
+            for (let i = 0; i < chars.length; i++) {
+                const modified = original + chars[i];
+                if (calculateJavaHashCode(modified) === targetHash) {
+                    results.push(modified);
+                }
+            }
+            
+            // Tentar adicionar caracteres no início
+            for (let i = 0; i < chars.length; i++) {
+                const modified = chars[i] + original;
+                if (calculateJavaHashCode(modified) === targetHash) {
+                    results.push(modified);
+                }
+            }
+            
+            return results;
+        }
+
+        function generateSpecialString(length, targetHash) {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=[]{}|;:,.<>?';
+            
+            // Tentar algumas combinações específicas
+            for (let attempt = 0; attempt < 100; attempt++) {
+                let str = '';
+                for (let i = 0; i < length; i++) {
+                    str += chars.charAt(Math.floor(Math.random() * chars.length));
+                }
+                if (calculateJavaHashCode(str) === targetHash) {
+                    return str;
+                }
+            }
+            return null;
+        }
+
+        function displayCollisions(originalString, targetHash, result, container) {
+            let html = `
+                <div class="collision-section">
+                    <h3>🎯 Strings com o mesmo HashCode</h3>
+                    <div class="collision-result">
+                        <strong>String Original:</strong> <span class="collision-string">"${originalString}"</span>
+                        <br><strong>HashCode Alvo:</strong> ${targetHash}
+                        <br><strong>Tentativas realizadas:</strong> ${result.attempts.toLocaleString()}
+                        <br><strong>Tempo decorrido:</strong> ${result.timeElapsed} segundos
+                        ${result.timedOut ? '<br><span style="color: #f56565;">⏰ Tempo limite de 20 segundos atingido</span>' : ''}
+                        ${result.maxReached && !result.timedOut ? '<br><span style="color: #e53e3e;">⚠️ Limite máximo de tentativas atingido</span>' : ''}
+                    </div>
+            `;
+
+            if (result.found.length > 0) {
+                html += `
+                    <h4>✅ Colisões Encontradas (${result.found.length}):</h4>
+                    <div style="margin: 15px 0;">
+                `;
+                
+                result.found.forEach((collision, index) => {
+                    html += `
+                        <div class="collision-result">
+                            <strong>${index + 1}.</strong> <span class="collision-string">"${collision}"</span>
+                            <br><small>Comprimento: ${collision.length} caracteres</small>
+                            <br><small>Verificação: ${calculateJavaHashCode(collision)} = ${targetHash} ✓</small>
+                        </div>
+                    `;
+                });
+                
+                html += '</div>';
+            } else {
+                html += `
+                    <div class="collision-result" style="color: #e53e3e;">
+                        ❌ Nenhuma colisão encontrada após ${result.attempts.toLocaleString()} tentativas em ${result.timeElapsed} segundos.
+                        <br><small>Isso demonstra que colisões são raras! ${result.timedOut ? 'O algoritmo buscou por 20 segundos completos.' : 'Tente com uma string mais simples.'}</small>
+                    </div>
+                `;
+            }
+
+            html += `
+                <div style="margin-top: 20px; padding: 15px; background: #f0fff4; border-radius: 8px; border-left: 4px solid #48bb78;">
+                    <strong>💡 Sobre Colisões de Hash:</strong>
+                    <br>• Colisões ocorrem quando strings diferentes produzem o mesmo hashCode
+                    <br>• São relativamente raras, mas matematicamente inevitáveis
+                    <br>• Hash tables lidam com colisões usando técnicas como encadeamento ou endereçamento aberto
+                    <br>• Strings mais curtas têm maior probabilidade de gerar colisões
+                </div>
+            </div>
+            `;
+
+            container.innerHTML = html;
+        }
+
+        // Calcular automaticamente com exemplo inicial
+        window.onload = function() {
+            document.getElementById('stringInput').value = 'Hello';
+            calculateHashCode();
+        };
+    </script>
+</body>
+</html>

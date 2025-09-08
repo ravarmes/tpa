@@ -1,0 +1,119 @@
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="800" height="500" fill="#f8f9fa"/>
+  
+  <!-- Title -->
+  <text x="400" y="30" text-anchor="middle" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="#2c3e50">Estrutura de uma Tabela Hash</text>
+  
+  <!-- Object/Key Section -->
+  <g>
+    <!-- Object Box -->
+    <rect x="50" y="80" width="120" height="60" fill="#e8f5e8" stroke="#27ae60" stroke-width="2" rx="5"/>
+    <text x="110" y="100" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#27ae60">Nome</text>
+    <text x="110" y="115" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#2c3e50">"João"</text>
+    <text x="110" y="130" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#7f8c8d">hashCode: 12345</text>
+  </g>
+  
+  <!-- Arrow 1: Object to HashCode -->
+  <path d="M 170 110 L 220 110" stroke="#3498db" stroke-width="3" fill="none" marker-end="url(#arrowhead)"/>
+  <text x="195" y="105" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#3498db">hashCode()</text>
+  
+  <!-- HashCode Section -->
+  <g>
+    <rect x="230" y="80" width="100" height="60" fill="#e3f2fd" stroke="#2196f3" stroke-width="2" rx="5"/>
+    <text x="280" y="100" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#2196f3">HashCode</text>
+    <text x="280" y="120" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#2c3e50">12345</text>
+    <text x="280" y="135" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#7f8c8d">(código único)</text>
+  </g>
+  
+  <!-- Arrow 2: HashCode to Hash Function -->
+  <path d="M 330 110 L 380 110" stroke="#e74c3c" stroke-width="3" fill="none" marker-end="url(#arrowhead)"/>
+  <text x="355" y="105" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#e74c3c">hash()</text>
+  
+  <!-- Hash Function Section -->
+  <g>
+    <rect x="390" y="70" width="140" height="80" fill="#ffeaa7" stroke="#fdcb6e" stroke-width="2" rx="5"/>
+    <text x="460" y="90" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#e17055">Função Hash</text>
+    <text x="460" y="110" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#2c3e50">12345 % 6 = 3</text>
+    <text x="460" y="125" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#7f8c8d">(hash modular)</text>
+    <text x="460" y="140" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#7f8c8d">Índice: 3</text>
+  </g>
+  
+  <!-- Arrow 3: Hash Function to Array -->
+  <path d="M 530 110 L 580 110" stroke="#9b59b6" stroke-width="3" fill="none" marker-end="url(#arrowhead)"/>
+  
+  <!-- Hash Table Array -->
+  <g>
+    <!-- Array structure -->
+    <rect x="590" y="60" width="180" height="300" fill="#ffffff" stroke="#34495e" stroke-width="2" rx="5"/>
+    <text x="680" y="50" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#2c3e50">Tabela Hash (Array)</text>
+    
+    <!-- Array indices and slots -->
+    <!-- Index 0 -->
+    <rect x="600" y="70" width="30" height="40" fill="#ecf0f1" stroke="#bdc3c7" stroke-width="1"/>
+    <text x="615" y="93" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#2c3e50">0</text>
+    <rect x="635" y="70" width="125" height="40" fill="#ffffff" stroke="#bdc3c7" stroke-width="1"/>
+    <text x="697" y="93" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#7f8c8d">null</text>
+    
+    <!-- Index 1 -->
+    <rect x="600" y="115" width="30" height="40" fill="#ecf0f1" stroke="#bdc3c7" stroke-width="1"/>
+    <text x="615" y="138" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#2c3e50">1</text>
+    <rect x="635" y="115" width="125" height="40" fill="#ffffff" stroke="#bdc3c7" stroke-width="1"/>
+    <text x="697" y="138" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#7f8c8d">null</text>
+    
+    <!-- Index 2 -->
+    <rect x="600" y="160" width="30" height="40" fill="#ecf0f1" stroke="#bdc3c7" stroke-width="1"/>
+    <text x="615" y="183" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#2c3e50">2</text>
+    <rect x="635" y="160" width="125" height="40" fill="#ffffff" stroke="#bdc3c7" stroke-width="1"/>
+    <text x="697" y="183" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#7f8c8d">null</text>
+    
+    <!-- Index 3 - HIGHLIGHTED (where our element is stored) -->
+    <rect x="600" y="205" width="30" height="40" fill="#e8f5e8" stroke="#27ae60" stroke-width="3"/>
+    <text x="615" y="228" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#27ae60">3</text>
+    <rect x="635" y="205" width="125" height="40" fill="#e8f5e8" stroke="#27ae60" stroke-width="3"/>
+    <text x="697" y="220" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="#27ae60">João</text>
+    <text x="697" y="235" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="#2c3e50">hashCode: 12345</text>
+    
+    <!-- Index 4 -->
+    <rect x="600" y="250" width="30" height="40" fill="#ecf0f1" stroke="#bdc3c7" stroke-width="1"/>
+    <text x="615" y="273" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#2c3e50">4</text>
+    <rect x="635" y="250" width="125" height="40" fill="#ffffff" stroke="#bdc3c7" stroke-width="1"/>
+    <text x="697" y="273" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#7f8c8d">null</text>
+    
+    <!-- Index 5 -->
+    <rect x="600" y="295" width="30" height="40" fill="#ecf0f1" stroke="#bdc3c7" stroke-width="1"/>
+    <text x="615" y="318" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#2c3e50">5</text>
+    <rect x="635" y="295" width="125" height="40" fill="#ffffff" stroke="#bdc3c7" stroke-width="1"/>
+    <text x="697" y="318" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#7f8c8d">null</text>
+  </g>
+  
+  <!-- Highlight arrow pointing to stored element -->
+  <path d="M 460 150 Q 520 180 590 225" stroke="#27ae60" stroke-width="4" fill="none" marker-end="url(#arrowhead-green)" stroke-dasharray="5,5"/>
+  <text x="520" y="200" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="#27ae60">Elemento armazenado</text>
+  <text x="520" y="215" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="#27ae60">no índice 3</text>
+  
+  <!-- Legend/Explanation Box -->
+  <g>
+    <rect x="50" y="380" width="700" height="100" fill="#ffffff" stroke="#34495e" stroke-width="2" rx="5"/>
+    <text x="400" y="400" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#2c3e50">Diferenças Importantes:</text>
+    
+    <text x="70" y="425" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#2196f3">• HashCode:</text>
+    <text x="150" y="425" font-family="Arial, sans-serif" font-size="12" fill="#2c3e50">Código único gerado pelo objeto (ex: 12345)</text>
+    
+    <text x="70" y="445" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#e17055">• Hash:</text>
+    <text x="120" y="445" font-family="Arial, sans-serif" font-size="12" fill="#2c3e50">Função que converte o hashCode em índice do array (ex: 12345 % 6 = 3)</text>
+    
+    <text x="70" y="465" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#27ae60">• Resultado:</text>
+    <text x="150" y="465" font-family="Arial, sans-serif" font-size="12" fill="#2c3e50">O objeto é armazenado no índice calculado pela função hash</text>
+  </g>
+  
+  <!-- Arrow markers -->
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#3498db"/>
+    </marker>
+    <marker id="arrowhead-green" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#27ae60"/>
+    </marker>
+  </defs>
+</svg>
